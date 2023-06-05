@@ -11,14 +11,11 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 import {
-  Button,
   StyleSheet,
   Text,
   View,
   SafeAreaView,
 } from 'react-native';
-
-import useStack from 'src/hooks/stack';
 
 import Connection from 'src/pages/connection';
 import Layers from 'src/pages/layers';
@@ -52,12 +49,6 @@ const styles = StyleSheet.create({
 });
 
 export default function App() {
-  // view stack
-  const {
-    stack: viewstack,
-    ops: { push: pushView, pop: popView },
-  } = useStack(['main']);
-
   return (
     <NativeRouter>
       <View style={styles.container}>
@@ -88,26 +79,6 @@ export default function App() {
               <Text>Connection</Text>
             </Link>
           </View>
-
-          <Button
-            title="Push View Layer"
-            onPress={() => pushView('layer')}
-          />
-          <Button
-            title="Pop View Layer"
-            onPress={() => popView()}
-          />
-
-          <Text>Hi!</Text>
-          <Text>
-            Stack depth:
-            {viewstack.depth}
-          </Text>
-          {viewstack.map((entry) => (
-            <React.Fragment key={`view.${entry}`}>
-              <Text>{entry}</Text>
-            </React.Fragment>
-          ))}
 
           <Routes>
             <Route path="/connection" element={<Connection />} />
