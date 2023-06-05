@@ -80,6 +80,13 @@ export default function App() {
             >
               <Text>Shards</Text>
             </Link>
+            <Link
+              to="/connection"
+              underlayColor={navUnderlayColor}
+              style={styles.navItem}
+            >
+              <Text>Connection</Text>
+            </Link>
           </View>
 
           <Button
