@@ -21,6 +21,8 @@ import Connection from 'src/pages/connection';
 import Layers from 'src/pages/layers';
 import Shards from 'src/pages/shards';
 
+import ConnectionProvider from 'src/providers/connection';
+
 const navUnderlayColor = '#f0f4f7';
 
 const styles = StyleSheet.create({
@@ -80,12 +82,23 @@ export default function App() {
             </Link>
           </View>
 
-          <Routes>
-            <Route path="/connection" element={<Connection />} />
-            <Route path="/shards" element={<Shards />} />
-            <Route path="/layers" element={<Layers />} />
-            <Route index element={<Navigate replace to="/layers" />} />
-          </Routes>
+          {/* The Connection used to control the target. */}
+          <ConnectionProvider
+            initial={{
+              host: '127.0.0.1',
+              port: 1337,
+            }}
+          >
+
+            <Routes>
+              <Route path="/connection" element={<Connection />} />
+              <Route path="/shards" element={<Shards />} />
+              <Route path="/layers" element={<Layers />} />
+              <Route index element={<Navigate replace to="/layers" />} />
+            </Routes>
+
+          </ConnectionProvider>
+
         </SafeAreaView>
       </View>
     </NativeRouter>
