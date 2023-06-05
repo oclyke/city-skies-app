@@ -8,7 +8,6 @@ class Stack extends Array {
   }
 
   get depth () {
-    console.log(this)
     return this.length;
   }
 }
