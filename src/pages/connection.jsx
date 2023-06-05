@@ -8,6 +8,7 @@ import {
   Text,
   TextInput,
   View,
+  StyleSheet,
 } from 'react-native';
 
 import {
@@ -34,6 +35,15 @@ function apiFactory({ setHost, setPort }) {
   };
 }
 
+const styles = StyleSheet.create({
+  error: {
+    color: 'red',
+  },
+  success: {
+    color: 'green',
+  },
+});
+
 export default function Connection() {
   const {
     setHost,
@@ -44,6 +54,7 @@ export default function Connection() {
     address,
     host,
     port,
+    connected,
   } = useConnectionState();
 
   const {
@@ -66,6 +77,8 @@ export default function Connection() {
   return (
     <>
       <Text>Connection Page</Text>
+      <Text>Connection Status:</Text>
+      <Text style={connected ? styles.success : styles.error}>{connected ? 'connected' : 'not connected'}</Text>
       <Text>
         Target Address:
         {address}

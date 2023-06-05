@@ -3,12 +3,27 @@ import React, {
   useState,
   useContext,
   createContext,
+  useEffect,
 } from 'react';
 
 const NO_CONTEXT_ERROR_TEXT = 'No ConnectionContext found. Use ConnectionProvider.';
 
 const ConnectionStateContext = createContext(null);
 const ConnectionApiContext = createContext(null);
+
+/**
+ * Tries the connection in state and indicates success or failure.
+ * @param {*} state The ConnectionState used for the test.
+ * @returns true for successful connection, else false.
+ */
+async function tryConnection(state) {
+  try {
+    await fetch(`http://${state.address}/info`, { method: 'GET' });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Gets the ConnectionState with computed values.
@@ -42,6 +57,7 @@ function makeInitialConnectionState(initial) {
   return getComputedState({
     ...assumed,
     ...initial,
+    connected: false,
   });
 }
 
@@ -79,9 +95,25 @@ function connectionApiFactory(setState, initialState) {
 export default function ConnectionProvider({ children, initial }) {
   const [initialState] = useState(() => makeInitialConnectionState(initial));
   const [state, setState] = useState(() => initialState);
+  const [pingLoop, setPingLoop] = useState(null);
 
   // memoized API allows API consumers not to re-render on state change
   const api = useMemo(() => connectionApiFactory(setState, initialState), [setState, initialState]);
+
+  // periodically ping the connection to see if it is alive
+  useEffect(() => {
+    setPingLoop(setInterval(() => {
+      tryConnection(state)
+        .then((connected) => {
+          setState((prev) => ({ ...prev, connected }));
+        })
+        .catch(console.error);
+    }, 1500));
+
+    return function cleanup() {
+      clearInterval(pingLoop);
+    };
+  }, [setState, state]);
 
   return (
     <ConnectionStateContext.Provider value={state}>
