@@ -12,5 +12,6 @@ module.exports = {
     'react/style-prop-object': 0,
     'react/prop-types': 0,
     'import/no-unresolved': 0,
+    'import/no-extraneous-dependencies': 0,
   },
 };

@@ -6,6 +6,8 @@ import React, {
   useEffect,
 } from 'react';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const NO_CONTEXT_ERROR_TEXT = 'No ConnectionContext found. Use ConnectionProvider.';
 
 const ConnectionStateContext = createContext(null);
@@ -67,17 +69,32 @@ function makeInitialConnectionState(initial) {
  * called with the connectionReducer.
  * @returns The ConnectionApi.
  */
-function connectionApiFactory(setState, initialState) {
+function connectionApiFactory(setState, initialState, storageKey) {
   function setHost(host) {
-    setState((prev) => (getComputedState({ ...prev, host })));
+    setState((prev) => {
+      const updated = getComputedState({ ...prev, host });
+      AsyncStorage.setItem(storageKey, JSON.stringify(updated))
+        .catch(console.error);
+      return updated;
+    });
   }
 
   function setPort(port) {
-    setState((prev) => (getComputedState({ ...prev, port })));
+    setState((prev) => {
+      const updated = getComputedState({ ...prev, port });
+      AsyncStorage.setItem(storageKey, JSON.stringify(updated))
+        .catch(console.error);
+      return updated;
+    });
   }
 
   function reset() {
-    setState(getComputedState(initialState));
+    setState(() => {
+      const updated = getComputedState(initialState);
+      AsyncStorage.setItem(storageKey, JSON.stringify(updated))
+        .catch(console.error);
+      return updated;
+    });
   }
 
   return {
@@ -92,13 +109,33 @@ function connectionApiFactory(setState, initialState) {
  * @param {*} param0
  * @returns
  */
-export default function ConnectionProvider({ children, initial }) {
+export default function ConnectionProvider({ children, initial, storageKey }) {
   const [initialState] = useState(() => makeInitialConnectionState(initial));
   const [state, setState] = useState(() => initialState);
   const [pingLoop, setPingLoop] = useState(null);
 
+  // get the full AsyncStorage key for persisting connection information
+  const key = `connection:${storageKey}`;
+
   // memoized API allows API consumers not to re-render on state change
-  const api = useMemo(() => connectionApiFactory(setState, initialState), [setState, initialState]);
+  const api = useMemo(
+    () => connectionApiFactory(setState, initialState, key),
+    [setState, initialState, key],
+  );
+
+  // attempt to load persisted connection
+  useEffect(() => {
+    AsyncStorage.getItem(key)
+      .then((value) => {
+        if (value !== null) {
+          setState(JSON.parse(value));
+        } else {
+          AsyncStorage.setItem(key, JSON.stringify(state))
+            .catch(console.error);
+        }
+      })
+      .catch(console.error);
+  }, [key]);
 
   // periodically ping the connection to see if it is alive
   useEffect(() => {

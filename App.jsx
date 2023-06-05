@@ -85,6 +85,7 @@ export default function App() {
 
           {/* The Connection used to control the target. */}
           <ConnectionProvider
+            storageKey="primary"
             initial={{
               host: '127.0.0.1',
               port: 1337,
