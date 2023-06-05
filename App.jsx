@@ -21,7 +21,9 @@ import Connection from 'src/pages/connection';
 import Layers from 'src/pages/layers';
 import Shards from 'src/pages/shards';
 
-import ConnectionProvider from 'src/providers/connection';
+import ConnectionProvider, {
+  useConnectionState,
+} from 'src/providers/connection';
 import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
 
 const navUnderlayColor = '#f0f4f7';
@@ -49,7 +51,52 @@ const styles = StyleSheet.create({
   subNavItem: {
     padding: 5,
   },
+  circle: {
+    height: 10,
+    width: 10,
+    borderRadius: '50%',
+  },
 });
+
+function Navigation() {
+  const {
+    connected,
+  } = useConnectionState();
+
+  return (
+    <View style={styles.nav}>
+      <Link
+        to="/layers"
+        underlayColor={navUnderlayColor}
+        style={styles.navItem}
+      >
+        <Text>Layers</Text>
+      </Link>
+      <Link
+        to="/shards"
+        underlayColor={navUnderlayColor}
+        style={styles.navItem}
+      >
+        <Text>Shards</Text>
+      </Link>
+      <Link
+        to="/connection"
+        underlayColor={navUnderlayColor}
+        style={styles.navItem}
+      >
+        <View>
+          <Text>Connection</Text>
+          <View
+            style={{
+              ...styles.circle,
+              backgroundColor: (connected) ? 'green' : 'red',
+            }}
+          />
+        </View>
+      </Link>
+    </View>
+  );
+}
 
 export default function App() {
   return (
@@ -57,31 +104,6 @@ export default function App() {
       <View style={styles.container}>
         <SafeAreaView style={styles.main}>
           <StatusBar style="auto" />
-
-          {/* navigation */}
-          <View style={styles.nav}>
-            <Link
-              to="/layers"
-              underlayColor={navUnderlayColor}
-              style={styles.navItem}
-            >
-              <Text>Layers</Text>
-            </Link>
-            <Link
-              to="/shards"
-              underlayColor={navUnderlayColor}
-              style={styles.navItem}
-            >
-              <Text>Shards</Text>
-            </Link>
-            <Link
-              to="/connection"
-              underlayColor={navUnderlayColor}
-              style={styles.navItem}
-            >
-              <Text>Connection</Text>
-            </Link>
-          </View>
 
           {/* The Connection used to control the target. */}
           <ConnectionProvider
@@ -99,6 +121,10 @@ export default function App() {
               ]}
             >
 
+              {/* Navigation to allow switching pages */}
+              <Navigation />
+
+              {/* Pages rendered under routes */}
               <Routes>
                 <Route path="/connection" element={<Connection />} />
                 <Route path="/shards" element={<Shards />} />
