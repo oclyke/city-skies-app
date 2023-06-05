@@ -22,6 +22,7 @@ import Layers from 'src/pages/layers';
 import Shards from 'src/pages/shards';
 
 import ConnectionProvider from 'src/providers/connection';
+import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
 
 const navUnderlayColor = '#f0f4f7';
 
@@ -90,13 +91,21 @@ export default function App() {
             }}
           >
 
-            <Routes>
-              <Route path="/connection" element={<Connection />} />
-              <Route path="/shards" element={<Shards />} />
-              <Route path="/layers" element={<Layers />} />
-              <Route index element={<Navigate replace to="/layers" />} />
-            </Routes>
+            {/* The FavoriteConnections saved by the user. */}
+            <FavoriteConnectionsProvider
+              initial={[
+                { name: 'Home', host: '127.0.0.1', port: 1337 },
+              ]}
+            >
 
+              <Routes>
+                <Route path="/connection" element={<Connection />} />
+                <Route path="/shards" element={<Shards />} />
+                <Route path="/layers" element={<Layers />} />
+                <Route index element={<Navigate replace to="/layers" />} />
+              </Routes>
+
+            </FavoriteConnectionsProvider>
           </ConnectionProvider>
 
         </SafeAreaView>

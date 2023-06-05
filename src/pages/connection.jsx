@@ -7,12 +7,18 @@ import {
   Button,
   Text,
   TextInput,
+  View,
 } from 'react-native';
 
 import {
   useConnectionApi,
   useConnectionState,
 } from 'src/providers/connection';
+
+import {
+  useFavoriteConnectionsApi,
+  useFavoriteConnectionsState,
+} from 'src/providers/favoriteConnections';
 
 function apiFactory({ setHost, setPort }) {
   function confirmHost(host) {
@@ -36,9 +42,18 @@ export default function Connection() {
   } = useConnectionApi();
   const {
     address,
+    host,
+    port,
   } = useConnectionState();
 
+  const {
+    add: addFavorite,
+    remove: removeFavorite,
+  } = useFavoriteConnectionsApi();
+  const favorites = useFavoriteConnectionsState();
+
   // state for text inputs
+  const [name, setName] = useState('');
   const [desiredHost, setDesiredHost] = useState('');
   const [desiredPort, setDesiredPort] = useState('');
 
@@ -55,6 +70,13 @@ export default function Connection() {
         Target Address:
         {address}
       </Text>
+
+      <TextInput
+        // style={styles.input}
+        placeholder="name"
+        value={name}
+        onChangeText={setName}
+      />
 
       <TextInput
         // style={styles.input}
@@ -83,6 +105,43 @@ export default function Connection() {
         title="reset to default"
         onPress={reset}
       />
+
+      <Button
+        title="save connection to favorites"
+        onPress={() => addFavorite({ host, port, name })}
+      />
+
+      <Text>Favorite Connections</Text>
+      {Object.keys(favorites).map((id) => {
+        const connection = favorites[id];
+        return (
+          <React.Fragment key={id}>
+            <View>
+              <Text>
+                {connection.host}
+                {connection.port}
+                {connection.name}
+              </Text>
+              <Button
+                title="use"
+                onPress={() => {
+                  confirmHost(connection.host);
+                  confirmPort(connection.port);
+                }}
+              />
+              <Button
+                title="remove"
+                onPress={() => removeFavorite(id)}
+              />
+            </View>
+          </React.Fragment>
+        );
+      })}
+      {Object.keys(favorites).length === 0 && (
+        <Text>
+          You havent saved any favorite connections yet!
+        </Text>
+      )}
     </>
   );
 }
