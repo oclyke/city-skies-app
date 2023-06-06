@@ -1,16 +1,10 @@
-import React, {
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React from 'react';
 
 import {
   Text,
 } from 'react-native';
 
-import {
-  useConnectionState,
-} from 'src/providers/connection';
+import useShards from 'src/hooks/shards';
 
 /*
 shards are programs which can be run in a layer
@@ -30,24 +24,16 @@ shard: {
 // }
 
 export default function Shards() {
-  const {
-    address,
-  } = useConnectionState();
-  const [shards, setShards] = useState([]);
-
-  // get initial listing of shards
-  useEffect(() => {
-    console.log('getting shards');
-    console.log(`http://${address}/shards`);
-    fetch(`http://${address}/shards`, { method: 'GET' })
-      .then((response) => {
-        console.log('got response: ', response);
-      })
-      .catch(console.error);
-  }, []);
+  const shards = useShards();
 
   return (
-    <Text>Shards Page</Text>
-
+    <>
+      <Text>Shards Page</Text>
+      {shards.map((shard) => (
+        <React.Fragment key={shard}>
+          <Text>{shard}</Text>
+        </React.Fragment>
+      ))}
+    </>
   );
 }
