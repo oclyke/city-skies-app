@@ -10,7 +10,24 @@ import {
 
 import ColorConvert from 'color-convert';
 
-export default function Variable({ variable }) {
+export default function Variable({ path }) {
+
+  return (
+    <View>
+      <Text>{path}</Text>
+    </View>
+  )
+
+
+
+  const variable = {
+    type: 3,
+    info: {
+      defaultRange: [],
+      value: 0.69,
+    },
+  };
+
   switch (variable.type) {
     // floating point variable
     case 3: {

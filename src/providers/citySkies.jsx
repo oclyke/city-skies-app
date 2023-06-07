@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useContext,
   useRef,
+  useState,
 } from 'react';
 
 import {
@@ -82,6 +83,59 @@ export function useCitySkiesInstance() {
   }
 
   return context;
+}
+
+/**
+ * Returns the data for a given path on a city skies instance
+ */
+export function usePath(path, initializer) {
+  const {
+    cache,
+    connection: {
+      address,
+      connected,
+    },
+  } = useCitySkiesInstance();
+
+  // maintain boolean loading state
+  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(initializer);
+
+  // console.log("usePath called with: ", { address, path, loading, items: cache.items })
+
+  // get initial data
+  useEffect(() => {
+    // mark invalid
+    setLoading(true);
+
+    // get data
+    cache.get(path)
+      .then((value) => {
+        setState(value);
+        setLoading(false);
+      })
+      .catch(() => {
+        console.log('cache missed path: ', path);
+        if (connected) {
+          const endpoint = `http://${address}${path}`;
+          console.log('fetching ', endpoint);
+          fetch(endpoint, { method: 'GET' })
+            .then((r) => r.text())
+            .then((t) => JSON.parse(t))
+            .then((o) => {
+              setState(o);
+              setLoading(false);
+              cache.put(path, o)
+                .catch(console.error);
+            })
+            .catch(console.error);
+        } else {
+          console.log('disconnected');
+        }
+      });
+  }, [path, connected, address]);
+
+  return [state, loading];
 }
 
 export function useCitySkiesApi() {

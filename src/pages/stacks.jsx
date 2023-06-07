@@ -1,13 +1,10 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React from 'react';
 
 import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
 } from 'react-native';
 
 import {
@@ -21,7 +18,6 @@ import useStack from 'src/hooks/citySkies/stack';
 
 import Layer from 'src/components/layer';
 import useStackManager from 'src/hooks/citySkies/stackManager';
-import { useConnectionState } from 'src/providers/connection';
 
 const navUnderlayColor = '#f0f4f7';
 
@@ -89,11 +85,13 @@ function Stack({ id }) {
       <Text>Remote: {id}</Text>
 
       <Text>Layers:</Text>
-      {layerIds.map((layerId) => (
-        <React.Fragment key={`layer.${layerId}`}>
-          <Layer path={`/stacks/${id}/layers/${layerId}`} />
-        </React.Fragment>
-      ))}
+      <ScrollView>
+        {layerIds.map((layerId) => (
+          <React.Fragment key={`layer.${layerId}`}>
+            <Layer path={`/stacks/${id}/layers/${layerId}`} />
+          </React.Fragment>
+        ))}
+      </ScrollView>
     </>
   );
 }
