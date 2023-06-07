@@ -13,10 +13,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Layer({ uri }) {
+export default function Layer({ path }) {
+
+
+
   return (
     <View style={styles.container}>
-      <Text>{uri}</Text>
+      <Text>{path}</Text>
     </View>
   );
 }

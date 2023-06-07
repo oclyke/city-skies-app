@@ -80,7 +80,6 @@ function Stack({ id }) {
       ids: layerIds,
     },
   } = useStack(id);
-  const { address } = useConnectionState();
 
   return (
     <>
@@ -88,13 +87,11 @@ function Stack({ id }) {
 
       <Text>Stack info:</Text>
       <Text>Remote: {id}</Text>
-      {/* <Text>id: {info.id}</Text>
-      <Text>layer count: {info.layers.count}</Text> */}
 
       <Text>Layers:</Text>
       {layerIds.map((layerId) => (
         <React.Fragment key={`layer.${layerId}`}>
-          <Layer uri={`http://${address}/stacks/${id}/layers/${layerId}`} />
+          <Layer path={`/stacks/${id}/layers/${layerId}`} />
         </React.Fragment>
       ))}
     </>
