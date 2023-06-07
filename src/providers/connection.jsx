@@ -142,7 +142,9 @@ export default function ConnectionProvider({ children, initial, storageKey }) {
     setPingLoop(setInterval(() => {
       tryConnection(state)
         .then((connected) => {
-          setState((prev) => ({ ...prev, connected }));
+          // if connection state has not changed then return the original state
+          // (this prevents React from re-rendering any dependent components)
+          setState((prev) => ((prev.connected !== connected) ? { ...prev, connected } : prev));
         })
         .catch(console.error);
     }, 1500));
