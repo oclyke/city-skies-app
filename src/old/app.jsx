@@ -2,10 +2,6 @@
 
 export default function App() {
   const [ipaddr, setIpAddr] = useState(default_ipaddr);
-  const {
-    stack: viewstack,
-    ops: { push: pushView, pop: popView },
-  } = useStack(['main']);
 
   const port = 1337;
   const host = `${ipaddr}:${port}`;

@@ -1,4 +1,8 @@
-import React from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   StyleSheet,
@@ -12,6 +16,12 @@ import {
   Route,
   Routes,
 } from 'react-router-native';
+
+import useStack from 'src/hooks/citySkies/stack';
+
+import Layer from 'src/components/layer';
+import useStackManager from 'src/hooks/citySkies/stackManager';
+import { useConnectionState } from 'src/providers/connection';
 
 const navUnderlayColor = '#f0f4f7';
 
@@ -64,13 +74,39 @@ function StackNavigation() {
  * View a stack from the target.
  * @returns Stack component.
  */
-function Stack() {
+function Stack({ id }) {
+  const {
+    layers: {
+      ids: layerIds,
+    },
+  } = useStack(id);
+  const { address } = useConnectionState();
+
   return (
-    <Text>Stacks page</Text>
+    <>
+      <Text>Stacks page</Text>
+
+      <Text>Stack info:</Text>
+      <Text>Remote: {id}</Text>
+      {/* <Text>id: {info.id}</Text>
+      <Text>layer count: {info.layers.count}</Text> */}
+
+      <Text>Layers:</Text>
+      {layerIds.map((layerId) => (
+        <React.Fragment key={`layer.${layerId}`}>
+          <Layer uri={`http://${address}/stacks/${id}/layers/${layerId}`} />
+        </React.Fragment>
+      ))}
+    </>
   );
 }
 
 export default function Stacks() {
+  const {
+    active,
+    inactive,
+  } = useStackManager();
+
   return (
     <View
       style={styles.main}
@@ -82,8 +118,8 @@ export default function Stacks() {
 
       {/* active / background stacks rendered under routes */}
       <Routes>
-        <Route path="active" element={<Stack id="active" />} />
-        <Route path="background" element={<Stack id="inactive" />} />
+        <Route path="active" element={<Stack id={active} />} />
+        <Route path="background" element={<Stack id={inactive} />} />
         <Route index element={<Navigate replace to="active" />} />
       </Routes>
 

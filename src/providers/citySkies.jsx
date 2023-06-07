@@ -2,61 +2,26 @@ import React, {
   useMemo,
   createContext,
   useEffect,
-  useReducer,
-  useContext
+  useContext,
+  useRef,
 } from 'react';
 
 import {
   useConnectionState,
 } from 'src/providers/connection';
 
-import {
-  Instance as CitySkiesInstance,
-} from 'src/lib/citySkies';
+import KVStore from 'src/lib/cache';
 
 const NO_CONTEXT_ERROR_TEXT = 'No CitySkiesContext found. Use CitySkiesProvider.';
 
 const CitySkiesInstanceContext = createContext(null);
 const CitySkiesApiContext = createContext(null);
 
-/*
-state: {
-  address: "address of connection",
-  shards: [
-
-  ],
-  stacks: {
-    active: {
-
-    },
-    inactive: {
-
-    },
-  }
-
-}
-*/
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'replace': {
-      return {
-        ...action.nextState,
-      };
-    }
-    default: {
-      console.error(`unrecognized action type: "${action.type}". No changes applied.`);
-      return state;
-    }
-  }
-}
-
 /**
  * Creates a CitySkiesApi
- * @param {*} setState The dispatch used to change the CitySkiesInstance.
  * @returns The CitySkiesApi.
  */
-function apiFactory(dispatch) {
+function apiFactory() {
   function reload() {
     console.warn('not implemented');
   }
@@ -67,30 +32,43 @@ function apiFactory(dispatch) {
 }
 
 export default function CitySkiesProvider({ children }) {
-  const { address } = useConnectionState();
-  const [state, dispatch] = useReducer(reducer, new CitySkiesInstance());
+  // rely on the provided connection
+  const {
+    address,
+    connected,
+  } = useConnectionState();
+
+  // create a cache to store information about api endpoints
+  const { current: cache } = useRef(new KVStore());
 
   // memoized API allows API consumers not to re-render on state change
-  const api = useMemo(() => apiFactory(dispatch), [dispatch]);
+  const api = useMemo(
+    () => apiFactory(),
+    [],
+  );
 
-  // when the address changes perform change of address ritual
-  // (this has bad code smell to me, but we don't expect to change address often so fine whatever)
   useEffect(() => {
-    // getFullState(address)
-    //   .then((nextState) => {
-    //     dispatch({ type: 'replace', nextState });
-    //   });
-
-    console.warn('address has changed to ', address);
-
+    // clear the cache when the connection address changes
+    cache.clear();
   }, [address]);
 
-  console.log('render city skies provider');
+  // assemble a memoized state
+  const state = useMemo(() => ({
+    cache,
+    connection: {
+      address,
+      connected,
+    },
+  }), [
+    cache,
+    address,
+    connected,
+  ]);
 
   return (
     <CitySkiesInstanceContext.Provider value={state}>
       <CitySkiesApiContext.Provider value={api}>
-        {children}
+        { children }
       </CitySkiesApiContext.Provider>
     </CitySkiesInstanceContext.Provider>
   );
