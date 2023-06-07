@@ -31,7 +31,8 @@ function getShardNames(address) {
       // .then((response) => response.json())
       .then((j) => JSON.parse(j))
       .then(({ edges }) => {
-        resolve(edges.map((edge) => edge.cursor));
+        const modules = edges.map((edge) => edge.cursor).map((filename) => filename.replace(/\.[^/.]+$/, ''));
+        resolve(modules);
       })
       .catch(reject);
   });
