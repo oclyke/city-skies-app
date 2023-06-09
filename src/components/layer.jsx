@@ -92,7 +92,10 @@ export default function Layer({ path }) {
 
       <Button
         title="remove"
-        onPress={() => deleteLayer(`http://${address}${path}`)}
+        onPress={() => {
+          deleteLayer(`http://${address}${path}`)
+            .catch(console.error());
+        }}
       />
 
       <View>
