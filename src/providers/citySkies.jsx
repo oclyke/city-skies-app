@@ -96,12 +96,28 @@ export function usePath(path, initializer) {
       connected,
     },
   } = useCitySkiesInstance();
-
-  // maintain boolean loading state
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState(initializer);
 
-  // console.log("usePath called with: ", { address, path, loading, items: cache.items })
+  // construct the endpoint that will be used to access the data for this instance
+  const endpoint = `http://${address}${path}`;
+
+  const refresh = useMemo(() => (
+    () => {
+      if (connected === false) {
+        return Promise.reject(new Error('disconnected'));
+      }
+      return new Promise((resolve, reject) => {
+        console.log('fetching ', endpoint);
+        fetch(endpoint, { method: 'GET' })
+          .then((r) => r.text())
+          .then((t) => JSON.parse(t))
+          .then((data) => {
+            resolve(data);
+          })
+          .catch(reject);
+      });
+    }), [endpoint, connected]);
 
   // get initial data
   useEffect(() => {
@@ -114,28 +130,20 @@ export function usePath(path, initializer) {
         setState(value);
         setLoading(false);
       })
-      .catch(() => {
+      .catch(async () => {
         console.log('cache missed path: ', path);
-        if (connected) {
-          const endpoint = `http://${address}${path}`;
-          console.log('fetching ', endpoint);
-          fetch(endpoint, { method: 'GET' })
-            .then((r) => r.text())
-            .then((t) => JSON.parse(t))
-            .then((o) => {
-              setState(o);
-              setLoading(false);
-              cache.put(path, o)
-                .catch(console.error);
-            })
-            .catch(console.error);
-        } else {
-          console.log('disconnected');
+        try {
+          const data = await refresh();
+          setState(data);
+          setLoading(false);
+          cache.store(path, data);
+        } catch {
+          console.log('failed to update path: ', path);
         }
       });
-  }, [path, connected, address]);
+  }, [path, connected]);
 
-  return [state, loading];
+  return [state, loading, refresh];
 }
 
 export function useCitySkiesApi() {
