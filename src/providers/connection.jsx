@@ -20,7 +20,7 @@ const ConnectionApiContext = createContext(null);
  */
 async function tryConnection(state) {
   try {
-    await fetch(`http://${state.address}/info`, { method: 'GET' });
+    await fetch(`http://${state.address}/alive`, { method: 'GET' });
     return true;
   } catch {
     return false;

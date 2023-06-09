@@ -14,10 +14,11 @@ import {
   Routes,
 } from 'react-router-native';
 
-import useStack from 'src/hooks/citySkies/stack';
-
 import Layer from 'src/components/layer';
-import useStackManager from 'src/hooks/citySkies/stackManager';
+
+import {
+  usePath,
+} from 'src/providers/citySkies';
 
 const navUnderlayColor = '#f0f4f7';
 
@@ -43,52 +44,34 @@ const styles = StyleSheet.create({
 });
 
 /**
- * @returns Component for navigating between stacks
- */
-function StackNavigation() {
-  return (
-    <View style={styles.nav}>
-      <Link
-        to="/stacks/active"
-        underlayColor={navUnderlayColor}
-        style={styles.navItem}
-      >
-        <Text>Active</Text>
-      </Link>
-      <Link
-        to="/stacks/background"
-        underlayColor={navUnderlayColor}
-        style={styles.navItem}
-      >
-        <Text>Background</Text>
-      </Link>
-    </View>
-  );
-}
-
-/**
  * View a stack from the target.
  * @returns Stack component.
  */
-function Stack({ id }) {
+function Stack({ path }) {
+  const [data, loading] = usePath(path);
+
+  if (loading === true) {
+    return (
+      <Text>Loading</Text>
+    );
+  }
+
   const {
+    id,
     layers: {
-      ids: layerIds,
+      ids,
     },
-  } = useStack(id);
+  } = data;
 
   return (
     <>
-      <Text>Stacks page</Text>
-
-      <Text>Stack info:</Text>
-      <Text>Remote: {id}</Text>
+      <Text>{`Stack: ${id}`}</Text>
 
       <Text>Layers:</Text>
       <ScrollView>
-        {layerIds.map((layerId) => (
+        {ids.map((layerId) => (
           <React.Fragment key={`layer.${layerId}`}>
-            <Layer path={`/stacks/${id}/layers/${layerId}`} />
+            <Layer path={`/api/v0/output/stack/${id}/layer/${layerId}`} />
           </React.Fragment>
         ))}
       </ScrollView>
@@ -97,10 +80,20 @@ function Stack({ id }) {
 }
 
 export default function Stacks() {
+  const [data, loading] = usePath('/api/v0/output');
+
+  if (loading === true) {
+    return (
+      <Text>Loading</Text>
+    );
+  }
+
   const {
-    active,
-    inactive,
-  } = useStackManager();
+    stacks: {
+      active,
+    },
+  } = data;
+  const inactive = (active === 'A') ? 'B' : 'A';
 
   return (
     <View
@@ -109,12 +102,27 @@ export default function Stacks() {
       <Text>Layers Page</Text>
 
       {/* stack selection */}
-      <StackNavigation />
+      <View style={styles.nav}>
+        <Link
+          to="/stacks/active"
+          underlayColor={navUnderlayColor}
+          style={styles.navItem}
+        >
+          <Text>Active</Text>
+        </Link>
+        <Link
+          to="/stacks/background"
+          underlayColor={navUnderlayColor}
+          style={styles.navItem}
+        >
+          <Text>Background</Text>
+        </Link>
+      </View>
 
       {/* active / background stacks rendered under routes */}
       <Routes>
-        <Route path="active" element={<Stack id={active} />} />
-        <Route path="background" element={<Stack id={inactive} />} />
+        <Route path="active" element={<Stack path={`/api/v0/output/stack/${active}`} />} />
+        <Route path="background" element={<Stack path={`/api/v0/output/stack/${inactive}`} />} />
         <Route index element={<Navigate replace to="active" />} />
       </Routes>
 

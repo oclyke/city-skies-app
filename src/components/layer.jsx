@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   Text,
+  Button,
 } from 'react-native';
 
 import Variable from 'src/components/variable';
@@ -11,6 +12,16 @@ import Variable from 'src/components/variable';
 import {
   usePath,
 } from 'src/providers/citySkies';
+
+import {
+  useConnectionState,
+} from 'src/providers/connection';
+
+function deleteLayer(path) {
+  return fetch(path, {
+    method: 'DELETE',
+  });
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -20,25 +31,25 @@ const styles = StyleSheet.create({
 });
 
 function LayerInfo({ path }) {
-  const [{
-    active,
-    id,
-    index,
-    shard_uuid: shardId,
-    use_local_palette: useLocalPalette,
-  }, loading] = usePath(path, {
-    active: false,
-    id: 0,
-    index: 0,
-    shard_uuid: '',
-    use_local_palette: false,
-  });
+  const [data, loading] = usePath(path);
 
   if (loading) {
     return (
       <Text>Loading</Text>
     );
   }
+
+  const {
+    // variables,
+    // privateVariables,
+    config: {
+      active,
+      id,
+      index,
+      shard_uuid: shardId,
+      use_local_palette: useLocalPalette,
+    },
+  } = data;
 
   return (
     <View>
@@ -52,40 +63,60 @@ function LayerInfo({ path }) {
   );
 }
 
-function VariablesList({ path }) {
-  const [variables, loading] = usePath(path, []);
+export default function Layer({ path }) {
+  const { address } = useConnectionState();
+  const [data, loading] = usePath(path);
 
-  if (loading) {
+  console.log(data, path);
+
+  if (loading === true) {
     return (
       <Text>Loading</Text>
     );
   }
 
-  return (
-    <View>
-      {variables.map((variableName) => (
-        <React.Fragment key={variableName}>
-          <Variable path={`${path}/${variableName}`} />
-        </React.Fragment>
-      ))}
-    </View>
-  );
-}
+  const {
+    config,
+    variables: {
+      // total: totalVariables,
+      ids: variableIds,
+    },
+    privateVariables: {
+      // total: totalPrivateVariables,
+      ids: privateVariableIds,
+    },
+  } = data;
 
-export default function Layer({ path }) {
   return (
     <View style={styles.container}>
       <Text>{path}</Text>
-      <LayerInfo path={`${path}/info`} />
+      <LayerInfo path={path} />
+
+      <Button
+        title="remove"
+        onPress={() => deleteLayer(`http://${address}${path}`)}
+      />
+
+      <View>
+        <Text>{`Config: ${config}`}</Text>
+      </View>
 
       <View>
         <Text>Standard Variables</Text>
-        <VariablesList path={`${path}/private_variables`} />
+        {privateVariableIds.map((variableId) => (
+          <React.Fragment key={variableId}>
+            <Variable path={`${path}/private_variable/${variableId}`} />
+          </React.Fragment>
+        ))}
       </View>
 
       <View>
         <Text>Variables</Text>
-        <VariablesList path={`${path}/variables`} />
+        {variableIds.map((variableId) => (
+          <React.Fragment key={variableId}>
+            <Variable path={`${path}/variable/${variableId}`} />
+          </React.Fragment>
+        ))}
       </View>
 
     </View>
