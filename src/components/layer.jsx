@@ -67,8 +67,6 @@ export default function Layer({ path }) {
   const { address } = useConnectionState();
   const [data, loading] = usePath(path);
 
-  console.log(data, path);
-
   if (loading === true) {
     return (
       <Text>Loading</Text>

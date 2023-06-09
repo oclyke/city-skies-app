@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react';
+import React, {
+  useMemo,
+} from 'react';
 
 import {
   Text,
@@ -8,29 +10,13 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import useShards from 'src/hooks/shards';
-
 import {
   useConnectionState,
 } from 'src/providers/connection';
-import useStackManager from 'src/hooks/citySkies/stackManager';
 
-/*
-shards are programs which can be run in a layer
-the user can search shards and use them to add layers
-
-shard: {
-  name: "string",
-}
-
-*/
-
-// function getShards (host) {
-//   return fetch(`http://${host}/shards`, { method: 'GET' })
-//     .then((response) => {
-//       console.log(response);
-//     });
-// }
+import {
+  usePath,
+} from 'src/providers/citySkies';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,17 +25,24 @@ const styles = StyleSheet.create({
 });
 
 export default function Shards() {
-  const shards = useShards();
-  const { address } = useConnectionState();
   const {
-    active,
-  } = useStackManager();
+    address,
+  } = useConnectionState();
 
-  const endpoint = `http://${address}/stacks/${active}/layer`;
+  // console.log('using address: ', address)
+
+  const [{
+    stacks: {
+      active,
+    },
+  }, outputLoading] = usePath('/api/v0/output', { stacks: { active: 'A' } });
+  const [shards, shardsLoading] = usePath('/api/v0/shards');
+
+  const endpoint = `http://${address}/api/v0/output/stack/${active}/layer`;
 
   const postShard = useMemo(() => (
     (shardId) => {
-      console.log('posting shardid to active stack: ', shardId);
+      console.log('posting shard id to active stack: ', shardId);
       fetch(endpoint, {
         method: 'POST',
         body: JSON.stringify({
@@ -59,11 +52,22 @@ export default function Shards() {
         .catch(console.error);
     }), [endpoint]);
 
+  if ((outputLoading === true) || (shardsLoading === true)) {
+    return (
+      <Text>Loading</Text>
+    );
+  }
+
+  const {
+    edges,
+  } = shards;
+  const modules = edges.map((edge) => edge.cursor).map((filename) => filename.replace(/\.[^/.]+$/, ''));
+
   return (
     <>
       <Text>Shards Page</Text>
       <ScrollView style={styles.container}>
-        {shards.map((shard) => (
+        {modules.map((shard) => (
           <React.Fragment key={shard}>
             <View>
               <Text>{shard}</Text>
