@@ -12,6 +12,7 @@ import Variable from 'src/components/variable';
 import {
   useInstanceData,
   useInstanceConnection,
+  useInstanceApi,
 } from 'src/hooks/citySkies';
 
 function deleteLayer(path) {
@@ -60,7 +61,12 @@ function LayerInfo({ path }) {
   );
 }
 
-export default function Layer({ path }) {
+export default function Layer({ stackId, id }) {
+  const [, {
+    removeOutputStackLayer,
+    getOutputStackLayerPath,
+  }] = useInstanceApi();
+  const path = getOutputStackLayerPath(stackId, id);
   const { address } = useInstanceConnection();
   const [data, loading] = useInstanceData(path);
 
@@ -90,8 +96,9 @@ export default function Layer({ path }) {
       <Button
         title="remove"
         onPress={() => {
-          deleteLayer(`http://${address}${path}`)
-            .catch(console.error());
+          console.log('remove layer', path);
+          removeOutputStackLayer(stackId, id)
+            .catch(console.error);
         }}
       />
 

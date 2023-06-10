@@ -80,3 +80,8 @@ export function useInstanceData(path) {
 
   return [data, loading];
 }
+
+export function useInstanceApi() {
+  const api = useCitySkiesApi();
+  return api;
+}

@@ -2,8 +2,6 @@ import React, {
   useMemo,
   createContext,
   useContext,
-  useEffect,
-  useState,
 } from 'react';
 
 const NO_CONTEXT_ERROR_TEXT = 'No CitySkiesContext found. Use CitySkiesProvider.';
@@ -11,14 +9,19 @@ const NO_CONTEXT_ERROR_TEXT = 'No CitySkiesContext found. Use CitySkiesProvider.
 const CitySkiesStateContext = createContext(null);
 const CitySkiesApiContext = createContext(null);
 
-export default function CitySkiesProvider({ children, instance, defaultAddress }) {
+export default function CitySkiesProvider({
+  children,
+  instance,
+  defaultAddress,
+  apiVersion,
+}) {
   // memoized API allows API consumers not to re-render on state change
   // eslint-disable-next-line arrow-body-style
   const api = useMemo(() => {
-    return {
-      // no api yet
-    };
-  }, []);
+    const stat = instance.getApi('static');
+    const dynamic = instance.getApi(apiVersion);
+    return [stat, dynamic];
+  }, [apiVersion]);
 
   // assemble a memoized state
   const state = useMemo(() => ({

@@ -18,6 +18,7 @@ import Layer from 'src/components/layer';
 
 import {
   useInstanceData,
+  useInstanceApi,
 } from 'src/hooks/citySkies';
 
 const navUnderlayColor = '#f0f4f7';
@@ -48,7 +49,12 @@ const styles = StyleSheet.create({
  * @returns Stack component.
  */
 function Stack({ id }) {
-  const [data, loading] = useInstanceData(`/api/v0/output/stack/${id}`);
+  const [, {
+    removeOutputStackLayer,
+    getOutputStackPath,
+  }] = useInstanceApi();
+  const path = getOutputStackPath(id);
+  const [data, loading] = useInstanceData(path);
 
   if (loading === true) {
     return (
@@ -71,7 +77,7 @@ function Stack({ id }) {
       <ScrollView>
         {ids.map((layerId) => (
           <React.Fragment key={`layer.${layerId}`}>
-            <Layer path={`/api/v0/output/stack/${id}/layer/${layerId}`} />
+            <Layer stackId={id} id={layerId} />
           </React.Fragment>
         ))}
       </ScrollView>

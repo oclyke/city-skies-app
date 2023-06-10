@@ -29,7 +29,7 @@ import {
   useInstanceConnection,
 } from 'src/hooks/citySkies';
 
-import CitySkiesInterface from 'src/lib/citySkies/interface';
+import CitySkiesInterface from 'src/lib/citySkies';
 
 const instance = new CitySkiesInterface('localhost:1337');
 
@@ -140,6 +140,7 @@ export default function App() {
       {/* The CitySkies provider uses the Connection to provide CitySkies state and API  */}
       <CitySkiesProvider
         instance={instance}
+        apiVersion="v0"
       >
 
         {/* The FavoriteConnections saved by the user. */}
