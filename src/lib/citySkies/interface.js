@@ -4,7 +4,6 @@ import minimatch from 'minimatch';
 
 export default class CitySkiesInstance {
   constructor(address) {
-    console.log('creating instance');
     this.address = address;
     this.cache = new KVCache();
     this.graph = new DependencyGraph();
@@ -14,17 +13,10 @@ export default class CitySkiesInstance {
 
     // start a ping loop to test the connection state
     this.pingLoop = setInterval(() => {
-      console.log('pinging', this.address);
       const { alive } = this.getApi('static');
       alive()
-        .then(() => {
-          console.log('ping succeeded');
-          this.setConnectionState(true)
-        })
-        .catch(() => {
-          console.log('ping failed');
-          this.setConnectionState(false);
-        });
+        .then(() => this.setConnectionState(true))
+        .catch(() => this.setConnectionState(false));
     }, 1500);
   }
 

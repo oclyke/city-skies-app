@@ -28,6 +28,10 @@ import ConnectionProvider, {
 import CitySkiesProvider from 'src/providers/citySkies';
 import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
 
+import CitySkiesInterface from 'src/lib/citySkies/interface';
+
+const instance = new CitySkiesInterface('localhost:1337');
+
 const navUnderlayColor = '#f0f4f7';
 
 const styles = StyleSheet.create({
@@ -141,7 +145,9 @@ export default function App() {
       >
 
         {/* The CitySkies provider uses the Connection to provide CitySkies state and API  */}
-        <CitySkiesProvider>
+        <CitySkiesProvider
+          instance={instance}
+        >
 
           {/* The FavoriteConnections saved by the user. */}
           <FavoriteConnectionsProvider

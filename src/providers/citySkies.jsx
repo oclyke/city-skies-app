@@ -1,9 +1,9 @@
 import React, {
   useMemo,
   createContext,
-  useEffect,
   useContext,
   useRef,
+  useEffect,
   useState,
 } from 'react';
 
@@ -11,139 +11,64 @@ import {
   useConnectionState,
 } from 'src/providers/connection';
 
-import KVStore from 'src/lib/cache';
+import CitySkiesInterface from 'src/lib/citySkies/interface';
 
 const NO_CONTEXT_ERROR_TEXT = 'No CitySkiesContext found. Use CitySkiesProvider.';
 
-const CitySkiesInstanceContext = createContext(null);
+const CitySkiesStateContext = createContext(null);
 const CitySkiesApiContext = createContext(null);
 
-/**
- * Creates a CitySkiesApi
- * @returns The CitySkiesApi.
- */
-function apiFactory() {
-  function reload() {
-    console.warn('not implemented');
-  }
+export default function CitySkiesProvider({ children, instance }) {
+  const { address } = useConnectionState();
+  const [connected, setConnected] = useState(false);
 
-  return {
-    reload,
-  };
-}
+  // update the instance address when the connection state changes
+  // subscribe to connection state changes
+  useEffect(() => {
+    instance.setAddress(address);
 
-export default function CitySkiesProvider({ children }) {
-  // rely on the provided connection
-  const {
-    address,
-    connected,
-  } = useConnectionState();
+    function listener(connectionStatus) {
+      setConnected(connectionStatus);
+      console.log('connection state changed', connectionStatus);
+    }
 
-  // create a cache to store information about api endpoints
-  const { current: cache } = useRef(new KVStore());
+    instance.subscribeConnection(listener);
+
+    return function cleanup() {
+      instance.unsubscribeConnection(listener);
+    };
+  }, [address]);
 
   // memoized API allows API consumers not to re-render on state change
-  const api = useMemo(
-    () => apiFactory(),
-    [],
-  );
-
-  useEffect(() => {
-    // clear the cache when the connection address changes
-    cache.clear();
+  const api = useMemo(() => {
+    console.log('creating api');
+    return {
+      
+    };
   }, [address]);
 
   // assemble a memoized state
   const state = useMemo(() => ({
-    cache,
-    connection: {
-      address,
-      connected,
-    },
-  }), [
-    cache,
-    address,
-    connected,
-  ]);
+    instance,
+  }), [instance]);
 
   return (
-    <CitySkiesInstanceContext.Provider value={state}>
+    <CitySkiesStateContext.Provider value={state}>
       <CitySkiesApiContext.Provider value={api}>
         { children }
       </CitySkiesApiContext.Provider>
-    </CitySkiesInstanceContext.Provider>
+    </CitySkiesStateContext.Provider>
   );
 }
 
-export function useCitySkiesInstance() {
-  const context = useContext(CitySkiesInstanceContext);
+export function useCitySkiesState() {
+  const context = useContext(CitySkiesStateContext);
 
   if (context === null) {
     throw new Error(NO_CONTEXT_ERROR_TEXT);
   }
 
   return context;
-}
-
-/**
- * Returns the data for a given path on a city skies instance
- */
-export function usePath(path, initializer) {
-  const {
-    cache,
-    connection: {
-      address,
-      connected,
-    },
-  } = useCitySkiesInstance();
-  const [loading, setLoading] = useState(true);
-  const [state, setState] = useState(initializer);
-
-  // construct the endpoint that will be used to access the data for this instance
-  const endpoint = `http://${address}${path}`;
-
-  const refresh = useMemo(() => (
-    () => {
-      if (connected === false) {
-        return Promise.reject(new Error('disconnected'));
-      }
-      return new Promise((resolve, reject) => {
-        console.log('fetching ', endpoint);
-        fetch(endpoint, { method: 'GET' })
-          .then((r) => r.text())
-          .then((t) => JSON.parse(t))
-          .then((data) => {
-            resolve(data);
-          })
-          .catch(reject);
-      });
-    }), [endpoint, connected]);
-
-  // get initial data
-  useEffect(() => {
-    // mark invalid
-    setLoading(true);
-
-    // get data
-    cache.get(path)
-      .then((value) => {
-        setState(value);
-        setLoading(false);
-      })
-      .catch(async () => {
-        console.log('cache missed path: ', path);
-        try {
-          const data = await refresh();
-          setState(data);
-          setLoading(false);
-          cache.store(path, data);
-        } catch {
-          console.log('failed to update path: ', path);
-        }
-      });
-  }, [path, connected]);
-
-  return [state, loading, refresh];
 }
 
 export function useCitySkiesApi() {
