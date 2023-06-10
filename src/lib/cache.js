@@ -1,21 +1,23 @@
-export default class KVStore {
+/* eslint-disable no-restricted-syntax */
+export default class KVCache {
   constructor() {
-    this.items = {};
-    this.validations = {};
+    this.items = new Map();
+    this.validations = new Map();
+    this.subscriptions = new Map();
   }
 
   /**
    * Synchronous method for validating a key
    */
   validate(key) {
-    this.validations[key] = true;
+    this.validations.set(key, true);
   }
 
   /**
    * Synchronous method for invalidating a key
    */
   invalidate(key) {
-    this.validations[key] = false;
+    this.validations.set(key, false);
   }
 
   /**
@@ -24,14 +26,14 @@ export default class KVStore {
    * @param {*} key used to get data from cache items.
    */
   extract(key) {
-    const valid = this.validations[key];
+    const valid = this.validations.get(key);
     if (typeof valid === 'undefined') {
       throw new Error('cache miss [nonexistent]');
     }
     if (valid !== true) {
       throw new Error('cache miss [invalid]');
     }
-    const data = this.items[key];
+    const data = this.items.get(key);
     return data;
   }
 
@@ -41,8 +43,9 @@ export default class KVStore {
    * @param {*} value
    */
   store(key, value) {
-    this.items[key] = value;
+    this.items.set(key, value);
     this.validate(key);
+    this.notify(key);
   }
 
   /**
@@ -75,5 +78,49 @@ export default class KVStore {
   clear() {
     this.items = {};
     return Promise.resolve();
+  }
+
+  /**
+   * Alows for subscribing to cache updates.
+   * The callback is called with the key and the new value when the value is updated.
+   * @param {*} key
+   * @param {*} callback
+   * @returns
+   */
+  subscribe(key, callback) {
+    let subs = this.subscriptions.get(key);
+    if (typeof subs === 'undefined') {
+      subs = new Map();
+      this.subscriptions.set(key, subs);
+    }
+    subs.set(key, callback);
+  }
+
+  /**
+   * Allows for unsubscribing from cache updates.
+   * @param {*} key
+   * @param {*} callback
+   * @returns
+   */
+  unsubscribe(key, callback) {
+    const subs = this.subscriptions.get(key);
+    if (typeof subs === 'undefined') {
+      return;
+    }
+    subs.delete(callback);
+  }
+
+  /**
+   * Notifies all subscribers of a cache update.
+   * @param {*} key the key of the cache update.
+   * @returns
+   */
+  notify(key) {
+    const subscribed = this.subscriptions.get(key);
+    if (typeof subscribed === 'undefined') {
+      return;
+    }
+    const value = this.extract(key);
+    subscribed.forEach((listener) => listener(key, value));
   }
 }

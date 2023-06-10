@@ -1,5 +1,8 @@
 import React, {
   useMemo,
+  useRef,
+  useState,
+  useEffect,
 } from 'react';
 
 import {
@@ -14,9 +17,7 @@ import {
   useConnectionState,
 } from 'src/providers/connection';
 
-import {
-  usePath,
-} from 'src/providers/citySkies';
+import KVCache from 'src/lib/cache';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,12 +25,74 @@ const styles = StyleSheet.create({
   },
 });
 
+/**
+ * Shards are a little weird - they are not really part of the api.
+ * So we are doing some weird stuff here.
+ */
+/**
+ * Returns the data for a given path on a city skies instance
+ */
+function usePath(path, initializer) {
+  const {
+    address,
+    connected,
+  } = useConnectionState();
+
+  const { current: cache } = useRef(new KVCache());
+  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(initializer);
+
+  // construct the endpoint that will be used to access the data for this instance
+  const endpoint = `http://${address}${path}`;
+
+  const refresh = useMemo(() => (
+    () => {
+      if (connected === false) {
+        return Promise.reject(new Error('disconnected'));
+      }
+      return new Promise((resolve, reject) => {
+        console.log('fetching ', endpoint);
+        fetch(endpoint, { method: 'GET' })
+          .then((r) => r.text())
+          .then((t) => JSON.parse(t))
+          .then((data) => {
+            resolve(data);
+          })
+          .catch(reject);
+      });
+    }), [endpoint, connected]);
+
+  // get initial data
+  useEffect(() => {
+    // mark invalid
+    setLoading(true);
+
+    // get data
+    cache.get(path)
+      .then((value) => {
+        setState(value);
+        setLoading(false);
+      })
+      .catch(async () => {
+        console.log('cache missed path: ', path);
+        try {
+          const data = await refresh();
+          setState(data);
+          setLoading(false);
+          cache.store(path, data);
+        } catch {
+          console.log('failed to update path: ', path);
+        }
+      });
+  }, [path, connected]);
+
+  return [state, loading, refresh];
+}
+
 export default function Shards() {
   const {
     address,
   } = useConnectionState();
-
-  // console.log('using address: ', address)
 
   const [{
     stacks: {

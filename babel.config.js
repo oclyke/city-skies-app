@@ -2,16 +2,23 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
-    plugins: [
+    presets: ['babel-preset-expo',
       [
-        'module-resolver',
+        '@babel/preset-env',
         {
-          alias: {
-            src: './src',
-          },
+          useBuiltIns: 'entry',
+          corejs: '3.22',
         },
       ],
+    ],
+    plugins: [
+      ['@babel/plugin-transform-private-property-in-object', { loose: true }],
+      ['@babel/plugin-transform-class-properties', { loose: true }],
+      ['module-resolver', {
+        alias: {
+          src: './src',
+        },
+      }],
     ],
   };
 };

@@ -10,8 +10,8 @@ import {
 import Variable from 'src/components/variable';
 
 import {
-  usePath,
-} from 'src/providers/citySkies';
+  useInstanceData,
+} from 'src/hooks/citySkies';
 
 import {
   useConnectionState,
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
 });
 
 function LayerInfo({ path }) {
-  const [data, loading] = usePath(path);
+  const [data, loading] = useInstanceData(path);
 
   if (loading) {
     return (
@@ -65,7 +65,7 @@ function LayerInfo({ path }) {
 
 export default function Layer({ path }) {
   const { address } = useConnectionState();
-  const [data, loading] = usePath(path);
+  const [data, loading] = useInstanceData(path);
 
   if (loading === true) {
     return (

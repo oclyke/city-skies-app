@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   StyleSheet,
@@ -17,8 +17,8 @@ import {
 import Layer from 'src/components/layer';
 
 import {
-  usePath,
-} from 'src/providers/citySkies';
+  useInstanceData,
+} from 'src/hooks/citySkies';
 
 const navUnderlayColor = '#f0f4f7';
 
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
  * View a stack from the target.
  * @returns Stack component.
  */
-function Stack({ path }) {
-  const [data, loading] = usePath(path);
+function Stack({ id }) {
+  const [data, loading] = useInstanceData(`/api/v0/output/stack/${id}`);
 
   if (loading === true) {
     return (
@@ -57,7 +57,7 @@ function Stack({ path }) {
   }
 
   const {
-    id,
+    id: stackId,
     layers: {
       ids,
     },
@@ -65,7 +65,7 @@ function Stack({ path }) {
 
   return (
     <>
-      <Text>{`Stack: ${id}`}</Text>
+      <Text>{`Stack: ${stackId}`}</Text>
 
       <Text>Layers:</Text>
       <ScrollView>
@@ -80,9 +80,9 @@ function Stack({ path }) {
 }
 
 export default function Stacks() {
-  const [data, loading] = usePath('/api/v0/output');
+  const [output, loading] = useInstanceData('/api/v0/output');
 
-  if (loading === true) {
+  if (loading) {
     return (
       <Text>Loading</Text>
     );
@@ -92,7 +92,7 @@ export default function Stacks() {
     stacks: {
       active,
     },
-  } = data;
+  } = output;
   const inactive = (active === 'A') ? 'B' : 'A';
 
   return (
@@ -121,8 +121,8 @@ export default function Stacks() {
 
       {/* active / background stacks rendered under routes */}
       <Routes>
-        <Route path="active" element={<Stack path={`/api/v0/output/stack/${active}`} />} />
-        <Route path="background" element={<Stack path={`/api/v0/output/stack/${inactive}`} />} />
+        <Route path="active" element={<Stack id={active} />} />
+        <Route path="background" element={<Stack id={inactive} />} />
         <Route index element={<Navigate replace to="active" />} />
       </Routes>
 

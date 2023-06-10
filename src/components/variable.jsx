@@ -5,8 +5,8 @@ import {
 } from 'react-native';
 
 import {
-  usePath,
-} from 'src/providers/citySkies';
+  useInstanceData,
+} from 'src/hooks/citySkies';
 
 import ColorConvert from 'color-convert';
 
@@ -224,7 +224,7 @@ function StringVariable({ info }) {
  * @returns
  */
 export default function Variable({ path }) {
-  const [info, loading] = usePath(path);
+  const [info, loading] = useInstanceData(path);
 
   // show loading state
   if (loading === true) {
