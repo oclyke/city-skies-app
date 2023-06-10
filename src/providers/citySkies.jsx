@@ -12,45 +12,19 @@ const CitySkiesStateContext = createContext(null);
 const CitySkiesApiContext = createContext(null);
 
 export default function CitySkiesProvider({ children, instance, defaultAddress }) {
-  const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState(instance.address);
-
-  console.log('city-skies-provider: ', address, instance.address, connected)
-
-  // update the instance address when the connection state changes
-  // subscribe to connection state changes
-  useEffect(() => {
-    function listener(connectionStatus) {
-      setConnected(connectionStatus);
-      console.log('connection state changed', connectionStatus);
-    }
-    instance.subscribeConnection(listener);
-    return function cleanup() {
-      instance.unsubscribeConnection(listener);
+  // memoized API allows API consumers not to re-render on state change
+  // eslint-disable-next-line arrow-body-style
+  const api = useMemo(() => {
+    return {
+      // no api yet
     };
   }, []);
-
-  // memoized API allows API consumers not to re-render on state change
-  const api = useMemo(() => {
-    console.log('creating api');
-    return {
-      setAddress: (addr) => {
-        instance.setAddress(addr);
-        setAddress(addr);
-      },
-      resetAddress: () => {
-        instance.setAddress(defaultAddress);
-        setAddress(defaultAddress);
-      },
-    };
-  }, [defaultAddress]);
 
   // assemble a memoized state
   const state = useMemo(() => ({
     instance,
-    connected,
-    address,
-  }), [instance]);
+    defaultAddress,
+  }), [instance, defaultAddress]);
 
   return (
     <CitySkiesStateContext.Provider value={state}>

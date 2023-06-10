@@ -4,10 +4,10 @@ import minimatch from 'minimatch';
 
 export default class CitySkiesInstance {
   constructor(address) {
-    this.address = address;
     this.cache = new KVCache();
     this.graph = new DependencyGraph();
 
+    this.address = address;
     this.connected = false;
     this.connectionListeners = [];
 
@@ -40,7 +40,10 @@ export default class CitySkiesInstance {
    * Notifies all connection listeners of the current connection state.
    */
   notifyConnection() {
-    this.connectionListeners.forEach((l) => l(this.connected));
+    this.connectionListeners.forEach((l) => l({
+      connected: this.connected,
+      address: this.address,
+    }));
   }
 
   /**

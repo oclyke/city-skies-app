@@ -11,20 +11,42 @@ import {
 
 export function useInstanceConnection() {
   const {
-    address,
-    connected,
-    // instance,
+    instance,
+    defaultAddress,
   } = useCitySkiesState();
-  const {
-    setAddress,
-    resetAddress,
-  } = useCitySkiesApi();
+  const [state, setState] = useState({
+    connected: instance.connected,
+    address: instance.address,
+  });
+
+  const api = useMemo(() => ({
+    setAddress: (addr) => {
+      setState((prev) => ({ ...prev, address: addr }));
+      instance.setAddress(addr);
+    },
+    resetAddress: () => {
+      setState((prev) => ({ ...prev, address: defaultAddress }));
+      instance.setAddress(defaultAddress);
+    },
+  }), [defaultAddress]);
+
+  // subscribe to connection state changes
+  // when the instance state changes, update the local state
+  useEffect(() => {
+    function listener(status) {
+      setState(status);
+    }
+    instance.subscribeConnection(listener);
+    return function cleanup() {
+      instance.unsubscribeConnection(listener);
+    };
+  }, []);
 
   return {
-    address,
-    connected,
-    setAddress,
-    resetAddress,
+    address: state.address,
+    connected: state.connected,
+    setAddress: api.setAddress,
+    resetAddress: api.resetAddress,
   };
 }
 
