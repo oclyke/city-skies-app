@@ -15,9 +15,10 @@ import {
 
 import {
   useInstanceConnection,
+  useInstanceApi,
 } from 'src/hooks/citySkies';
 
-import KVCache from 'src/lib/cache';
+import KVStore from 'src/lib/kvstore';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,7 +39,7 @@ function usePath(path, initializer) {
     connected,
   } = useInstanceConnection();
 
-  const { current: cache } = useRef(new KVCache());
+  const { current: cache } = useRef(new KVStore());
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState(initializer);
 
@@ -90,9 +91,9 @@ function usePath(path, initializer) {
 }
 
 export default function Shards() {
-  const {
-    address,
-  } = useInstanceConnection();
+  const [, {
+    addOutputStackLayer,
+  }] = useInstanceApi();
 
   const [{
     stacks: {
@@ -100,20 +101,6 @@ export default function Shards() {
     },
   }, outputLoading] = usePath('/api/v0/output', { stacks: { active: 'A' } });
   const [shards, shardsLoading] = usePath('/api/v0/shards');
-
-  const endpoint = `http://${address}/api/v0/output/stack/${active}/layer`;
-
-  const postShard = useMemo(() => (
-    (shardId) => {
-      console.log('posting shard id to active stack: ', shardId);
-      fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify({
-          shard_uuid: shardId,
-        }),
-      })
-        .catch(console.error);
-    }), [endpoint]);
 
   if ((outputLoading === true) || (shardsLoading === true)) {
     return (
@@ -136,7 +123,11 @@ export default function Shards() {
               <Text>{shard}</Text>
               <Button
                 title="add"
-                onPress={() => postShard(shard)}
+                onPress={() => {
+                  addOutputStackLayer(active, { shard_uuid: shard })
+                    .then(() => console.log('added'))
+                    .catch(console.error);
+                }}
               />
             </View>
           </React.Fragment>

@@ -1,9 +1,11 @@
 /* eslint-disable no-restricted-syntax */
-export default class KVCache {
+export default class KVStore {
   constructor() {
     this.items = new Map();
     this.validations = new Map();
     this.subscriptions = new Map();
+
+    this.initialize();
   }
 
   /**
@@ -46,6 +48,7 @@ export default class KVCache {
     this.items.set(key, value);
     this.validate(key);
     this.notify(key);
+    return [key, value];
   }
 
   /**
@@ -71,12 +74,19 @@ export default class KVCache {
    * @returns
    */
   put(key, value) {
-    this.store(key, value);
-    return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      try {
+        const data = this.store(key, value);
+        resolve(data);
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
-  clear() {
-    this.items = {};
+  initialize() {
+    this.items = new Map();
+    this.validations = new Map();
     return Promise.resolve();
   }
 

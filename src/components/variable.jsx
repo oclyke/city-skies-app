@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 import {
-  useInstanceData,
+  DEPRECATEDuseInstanceData,
 } from 'src/hooks/citySkies';
 
 import ColorConvert from 'color-convert';
@@ -224,7 +224,7 @@ function StringVariable({ info }) {
  * @returns
  */
 export default function Variable({ path }) {
-  const [info, loading] = useInstanceData(path);
+  const [info, loading] = DEPRECATEDuseInstanceData(path);
 
   // show loading state
   if (loading === true) {

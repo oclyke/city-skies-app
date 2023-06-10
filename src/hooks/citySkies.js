@@ -2,12 +2,17 @@ import {
   useMemo,
   useState,
   useEffect,
+  useRef,
 } from 'react';
 
 import {
   useCitySkiesState,
   useCitySkiesApi,
 } from 'src/providers/citySkies';
+
+export function useInstanceApi() {
+  return useCitySkiesApi();
+}
 
 export function useInstanceConnection() {
   const {
@@ -50,38 +55,89 @@ export function useInstanceConnection() {
   };
 }
 
-export function useInstanceData(path) {
+export function DEPRECATEDuseInstanceData(path) {
   const { instance } = useCitySkiesState();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const listener = useMemo(() => (
-    (key, value) => {
-      setData(value);
-      setLoading(false);
-    }), []);
-
-  // subscribe to the cache and get initial data
-  useEffect(() => {
-    instance.cache.subscribe(path, listener);
-
-    // use the cached data on the instance
-    instance.get(path)
-      .then((d) => {
-        setData(d);
-        setLoading(false);
-      })
-      .catch(console.error);
-
-    return function cleanup() {
-      instance.cache.unsubscribe(path);
-    };
-  }, [path]);
-
   return [data, loading];
 }
 
-export function useInstanceApi() {
-  const api = useCitySkiesApi();
-  return api;
+export function useInstanceData(get, ...args) {
+  const { instance } = useCitySkiesState();
+  const [path, setPath] = useState(null);
+  const [data, setData] = useState();
+
+  // kick off the initial data fetch
+  // this will set the path and data
+  // after the path is updated we will have access to the cache
+  useEffect(() => {
+    get(...args)
+      .then(([p, d]) => {
+        setData(d);
+        setPath(p);
+      })
+      .catch(console.error);
+  }, [get, ...args]);
+
+  // subscribe to the cache and get initial data
+  // when the path becomes known we can add a subscription to the cache
+  useEffect(() => {
+    if (path === null) {
+      // when the path is null do not subscribe
+      return () => {};
+    }
+
+    // the listener will update the state when the cache changes
+    // the cache will be updated by the api
+    function listener(key, value) {
+      console.log('the cache changed!', key, value);
+      setData(value);
+    }
+    instance.cache.subscribe(path, listener);
+
+    // return a cleanup function that unsubscribes from the cache
+    return function cleanup() {
+      instance.cache.unsubscribe(path, listener);
+    };
+  }, [path]);
+
+  // determine whether the data has been loaded
+  const loading = (path === null);
+
+  // return the state and loading status
+  return [data, loading];
+}
+
+/**
+ * Hook for output data from the instance.
+ * @returns the output data and loading status from useInstanceData.
+ */
+export function useInstanceOutput() {
+  const [, {
+    getOutput,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getOutput);
+  return state;
+}
+
+/**
+ * Hook for output stack data from the instance.
+ * @param {*} stackId the id of the stack to get.
+ * @returns the output data and loading status from useInstanceData.
+ */
+export function useInstanceOutputStack(stackId) {
+  const [, {
+    getOutputStack,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getOutputStack, stackId);
+  return state;
+}
+
+export function useInstanceOutputStackLayer(stackId, layerId) {
+  const [, {
+    getOutputStackLayer,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getOutputStackLayer, stackId, layerId);
+  return state;
 }

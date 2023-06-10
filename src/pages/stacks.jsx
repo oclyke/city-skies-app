@@ -14,11 +14,11 @@ import {
   Routes,
 } from 'react-router-native';
 
-import Layer from 'src/components/layer';
+import Layer from 'src/pages/layers';
 
 import {
-  useInstanceData,
-  useInstanceApi,
+  useInstanceOutput,
+  useInstanceOutputStack,
 } from 'src/hooks/citySkies';
 
 const navUnderlayColor = '#f0f4f7';
@@ -49,12 +49,9 @@ const styles = StyleSheet.create({
  * @returns Stack component.
  */
 function Stack({ id }) {
-  const [, {
-    removeOutputStackLayer,
-    getOutputStackPath,
-  }] = useInstanceApi();
-  const path = getOutputStackPath(id);
-  const [data, loading] = useInstanceData(path);
+  const [data, loading] = useInstanceOutputStack(id);
+
+  console.log('stack data', data);
 
   if (loading === true) {
     return (
@@ -86,7 +83,7 @@ function Stack({ id }) {
 }
 
 export default function Stacks() {
-  const [output, loading] = useInstanceData('/api/v0/output');
+  const [data, loading] = useInstanceOutput();
 
   if (loading) {
     return (
@@ -94,11 +91,12 @@ export default function Stacks() {
     );
   }
 
+  // unpack the data
   const {
     stacks: {
       active,
     },
-  } = output;
+  } = data;
   const inactive = (active === 'A') ? 'B' : 'A';
 
   return (
