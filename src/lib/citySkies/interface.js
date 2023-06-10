@@ -61,6 +61,7 @@ export default class CitySkiesInstance {
    * @param {*} address the new address of the instance.
    */
   setAddress(address) {
+    console.log('setting address', address)
     this.address = address;
   }
 

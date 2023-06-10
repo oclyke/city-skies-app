@@ -11,11 +11,8 @@ import Variable from 'src/components/variable';
 
 import {
   useInstanceData,
+  useInstanceConnection,
 } from 'src/hooks/citySkies';
-
-import {
-  useConnectionState,
-} from 'src/providers/connection';
 
 function deleteLayer(path) {
   return fetch(path, {
@@ -64,7 +61,7 @@ function LayerInfo({ path }) {
 }
 
 export default function Layer({ path }) {
-  const { address } = useConnectionState();
+  const { address } = useInstanceConnection();
   const [data, loading] = useInstanceData(path);
 
   if (loading === true) {

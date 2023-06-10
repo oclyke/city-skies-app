@@ -6,7 +6,27 @@ import {
 
 import {
   useCitySkiesState,
+  useCitySkiesApi,
 } from 'src/providers/citySkies';
+
+export function useInstanceConnection() {
+  const {
+    address,
+    connected,
+    // instance,
+  } = useCitySkiesState();
+  const {
+    setAddress,
+    resetAddress,
+  } = useCitySkiesApi();
+
+  return {
+    address,
+    connected,
+    setAddress,
+    resetAddress,
+  };
+}
 
 export function useInstanceData(path) {
   const { instance } = useCitySkiesState();

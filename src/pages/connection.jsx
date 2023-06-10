@@ -1,5 +1,4 @@
 import React, {
-  useMemo,
   useState,
 } from 'react';
 
@@ -12,28 +11,13 @@ import {
 } from 'react-native';
 
 import {
-  useConnectionApi,
-  useConnectionState,
-} from 'src/providers/connection';
-
-import {
   useFavoriteConnectionsApi,
   useFavoriteConnectionsState,
 } from 'src/providers/favoriteConnections';
 
-function apiFactory({ setHost, setPort }) {
-  function confirmHost(host) {
-    setHost(host);
-  }
-  function confirmPort(port) {
-    setPort(port);
-  }
-
-  return {
-    confirmHost,
-    confirmPort,
-  };
-}
+import {
+  useInstanceConnection,
+} from 'src/hooks/citySkies';
 
 const styles = StyleSheet.create({
   error: {
@@ -47,11 +31,8 @@ const styles = StyleSheet.create({
 function FavoriteConnection({ connection, onConfirm, onRemove }) {
   return (
     <View>
-      <Text>
-        {connection.host}
-        {connection.port}
-        {connection.name}
-      </Text>
+      <Text>{connection.name}</Text>
+      <Text>{connection.address}</Text>
       <Button
         title="use"
         onPress={() => {
@@ -74,17 +55,11 @@ function FavoriteConnection({ connection, onConfirm, onRemove }) {
 
 export default function Connection() {
   const {
-    setHost,
-    setPort,
-    reset,
-  } = useConnectionApi();
-  const {
     address,
-    host,
-    port,
     connected,
-  } = useConnectionState();
-
+    setAddress,
+    resetAddress,
+  } = useInstanceConnection();
   const {
     add: addFavorite,
     remove: removeFavorite,
@@ -95,12 +70,10 @@ export default function Connection() {
   const [name, setName] = useState('');
   const [desiredHost, setDesiredHost] = useState('');
   const [desiredPort, setDesiredPort] = useState('');
-
-  // memoized api will not cause re-renders
-  const {
-    confirmHost,
-    confirmPort,
-  } = useMemo(() => apiFactory({ setHost, setPort }), [setHost, setPort]);
+  const desiredConnection = {
+    address: `${desiredHost}:${desiredPort}`,
+    name,
+  };
 
   return (
     <>
@@ -137,41 +110,36 @@ export default function Connection() {
       <Button
         title="confirm"
         onPress={() => {
-          confirmHost(desiredHost);
-          confirmPort(desiredPort);
+          setAddress(`${desiredHost}:${desiredPort}`);
         }}
       />
 
       <Button
         title="reset to default"
-        onPress={reset}
+        onPress={() => resetAddress()}
       />
 
       <Button
         title="save connection to favorites"
-        onPress={() => addFavorite({ host, port, name })}
+        onPress={() => addFavorite(desiredConnection)}
       />
 
       {/* show user's favorite connections */}
       <Text>Favorite Connections</Text>
-      {Object.keys(favorites).map((id) => {
-        const connection = favorites[id];
-        return (
-          <React.Fragment key={id}>
-            <FavoriteConnection
-              connection={connection}
-              onConfirm={() => {
-                confirmHost(connection.host);
-                confirmPort(connection.port);
-              }}
-              onRemove={() => {
-                removeFavorite(id);
-              }}
-            />
-          </React.Fragment>
-        );
-      })}
-      {Object.keys(favorites).length === 0 && (
+      {favorites.map((connection) => (
+        <React.Fragment key={connection.id}>
+          <FavoriteConnection
+            connection={connection}
+            onConfirm={() => {
+              setAddress(connection.address);
+            }}
+            onRemove={() => {
+              removeFavorite(connection.id);
+            }}
+          />
+        </React.Fragment>
+      ))}
+      {favorites.length === 0 && (
         <Text>
           You havent saved any favorite connections yet!
         </Text>

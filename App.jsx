@@ -22,11 +22,12 @@ import Connection from 'src/pages/connection';
 import Stacks from 'src/pages/stacks';
 import Shards from 'src/pages/shards';
 
-import ConnectionProvider, {
-  useConnectionState,
-} from 'src/providers/connection';
 import CitySkiesProvider from 'src/providers/citySkies';
 import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
+
+import {
+  useInstanceConnection,
+} from 'src/hooks/citySkies';
 
 import CitySkiesInterface from 'src/lib/citySkies/interface';
 
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
 function Navigation() {
   const {
     connected,
-  } = useConnectionState();
+  } = useInstanceConnection();
 
   return (
     <View style={styles.nav}>
@@ -117,7 +118,7 @@ function Layout() {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.main}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Navigation />
         <Outlet />
       </SafeAreaView>
@@ -135,40 +136,32 @@ function Layout() {
 export default function App() {
   return (
     <NativeRouter>
-      {/* The Connection used to control the target. */}
-      <ConnectionProvider
-        storageKey="primary"
-        initial={{
-          host: '127.0.0.1',
-          port: 1337,
-        }}
+
+      {/* The CitySkies provider uses the Connection to provide CitySkies state and API  */}
+      <CitySkiesProvider
+        instance={instance}
       >
 
-        {/* The CitySkies provider uses the Connection to provide CitySkies state and API  */}
-        <CitySkiesProvider
-          instance={instance}
+        {/* The FavoriteConnections saved by the user. */}
+        <FavoriteConnectionsProvider
+          initial={[
+            { name: 'Home', address: '127.0.0.1:1337' },
+          ]}
         >
 
-          {/* The FavoriteConnections saved by the user. */}
-          <FavoriteConnectionsProvider
-            initial={[
-              { name: 'Home', host: '127.0.0.1', port: 1337 },
-            ]}
-          >
+          {/* Pages rendered under routes */}
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route path="connection" element={<Connection />} />
+              <Route path="shards/*" element={<Shards />} />
+              <Route path="stacks/*" element={<Stacks />} />
+            </Route>
+            <Route index element={<Navigate replace to="/stacks" />} />
+          </Routes>
 
-            {/* Pages rendered under routes */}
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route path="connection" element={<Connection />} />
-                <Route path="shards/*" element={<Shards />} />
-                <Route path="stacks/*" element={<Stacks />} />
-              </Route>
-              <Route index element={<Navigate replace to="/stacks" />} />
-            </Routes>
+        </FavoriteConnectionsProvider>
+      </CitySkiesProvider>
 
-          </FavoriteConnectionsProvider>
-        </CitySkiesProvider>
-      </ConnectionProvider>
     </NativeRouter>
   );
 }

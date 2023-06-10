@@ -2,54 +2,54 @@ import React, {
   useMemo,
   createContext,
   useContext,
-  useRef,
   useEffect,
   useState,
 } from 'react';
-
-import {
-  useConnectionState,
-} from 'src/providers/connection';
-
-import CitySkiesInterface from 'src/lib/citySkies/interface';
 
 const NO_CONTEXT_ERROR_TEXT = 'No CitySkiesContext found. Use CitySkiesProvider.';
 
 const CitySkiesStateContext = createContext(null);
 const CitySkiesApiContext = createContext(null);
 
-export default function CitySkiesProvider({ children, instance }) {
-  const { address } = useConnectionState();
+export default function CitySkiesProvider({ children, instance, defaultAddress }) {
   const [connected, setConnected] = useState(false);
+  const [address, setAddress] = useState(instance.address);
+
+  console.log('city-skies-provider: ', address, instance.address, connected)
 
   // update the instance address when the connection state changes
   // subscribe to connection state changes
   useEffect(() => {
-    instance.setAddress(address);
-
     function listener(connectionStatus) {
       setConnected(connectionStatus);
       console.log('connection state changed', connectionStatus);
     }
-
     instance.subscribeConnection(listener);
-
     return function cleanup() {
       instance.unsubscribeConnection(listener);
     };
-  }, [address]);
+  }, []);
 
   // memoized API allows API consumers not to re-render on state change
   const api = useMemo(() => {
     console.log('creating api');
     return {
-      
+      setAddress: (addr) => {
+        instance.setAddress(addr);
+        setAddress(addr);
+      },
+      resetAddress: () => {
+        instance.setAddress(defaultAddress);
+        setAddress(defaultAddress);
+      },
     };
-  }, [address]);
+  }, [defaultAddress]);
 
   // assemble a memoized state
   const state = useMemo(() => ({
     instance,
+    connected,
+    address,
   }), [instance]);
 
   return (

@@ -101,7 +101,7 @@ function favoriteConnectionsApiFactory(setState, key) {
  * @returns
  */
 export default function FavoriteConnectionsProvider({ children, initial }) {
-  const [state, setState] = useState({});
+  const [state, setState] = useState({ favorites: {}, nextId: 0 });
 
   // read the storage key first
   const key = favoriteConnectionsKey;
@@ -126,8 +126,12 @@ export default function FavoriteConnectionsProvider({ children, initial }) {
   // memoized API allows API consumers not to re-render on state change
   const api = useMemo(() => favoriteConnectionsApiFactory(setState, key), [setState, key]);
 
+  const favorites = useMemo(() => (
+    Object.keys(state.favorites).map((id) => ({ id, ...state.favorites[id] }))
+  ), [state.favorites]);
+
   return (
-    <FavoriteConnectionsStateContext.Provider value={state.favorites}>
+    <FavoriteConnectionsStateContext.Provider value={favorites}>
       <FavoriteConnectionsApiContext.Provider value={api}>
         {children}
       </FavoriteConnectionsApiContext.Provider>

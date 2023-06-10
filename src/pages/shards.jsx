@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 
 import {
-  useConnectionState,
-} from 'src/providers/connection';
+  useInstanceConnection,
+} from 'src/hooks/citySkies';
 
 import KVCache from 'src/lib/cache';
 
@@ -36,7 +36,7 @@ function usePath(path, initializer) {
   const {
     address,
     connected,
-  } = useConnectionState();
+  } = useInstanceConnection();
 
   const { current: cache } = useRef(new KVCache());
   const [loading, setLoading] = useState(true);
@@ -92,7 +92,7 @@ function usePath(path, initializer) {
 export default function Shards() {
   const {
     address,
-  } = useConnectionState();
+  } = useInstanceConnection();
 
   const [{
     stacks: {
