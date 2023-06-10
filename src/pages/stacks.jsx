@@ -51,8 +51,6 @@ const styles = StyleSheet.create({
 function Stack({ id }) {
   const [data, loading] = useInstanceOutputStack(id);
 
-  console.log('stack data', data);
-
   if (loading === true) {
     return (
       <Text>Loading</Text>

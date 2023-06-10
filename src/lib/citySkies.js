@@ -138,15 +138,17 @@ export default class CitySkiesInstance {
           ),
 
           // deleters
-          removeOutputStackLayer: (stack, layer) => (
-            fetchPathJson(paths.outputStackLayer(stack, layer), { method: 'DELETE' })
-              .then(([path, data]) => {
-
-                console.log('removeOutputStackLayer', path, data)
-
-                return data;
-              })
-          ),
+          removeOutputStackLayer: (stack, layer) => {
+            console.log('removing output stack layer', stack, layer);
+            return fetchPathJson(paths.outputStackLayer(stack, layer), { method: 'DELETE' })
+              .then(async (d) => {
+                // update the cached output stack data
+                fetchPathJson(paths.outputStack(stack), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached output data', e));
+                return d;
+              });
+          },
 
           // modifiers
           activateOutputStack: (stack) => (

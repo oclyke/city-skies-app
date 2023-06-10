@@ -56,6 +56,7 @@ export default function Layer({ stackId, id }) {
         title="remove"
         onPress={() => {
           removeOutputStackLayer(stackId, id)
+            .then(() => console.log('successfully removed layer', id))
             .catch(console.error);
         }}
       />
