@@ -21,6 +21,7 @@ import {
 import Connection from 'src/pages/connection';
 import Stacks from 'src/pages/stacks';
 import Shards from 'src/pages/shards';
+import Layer from 'src/pages/layer';
 
 import CitySkiesProvider from 'src/providers/citySkies';
 import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
@@ -156,6 +157,7 @@ export default function App() {
               <Route path="connection" element={<Connection />} />
               <Route path="shards/*" element={<Shards />} />
               <Route path="stacks/*" element={<Stacks />} />
+              <Route path="layer/:stackId/:layerId" element={<Layer />} />
             </Route>
             <Route index element={<Navigate replace to="/stacks" />} />
           </Routes>

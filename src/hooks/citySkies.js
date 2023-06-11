@@ -2,7 +2,6 @@ import {
   useMemo,
   useState,
   useEffect,
-  useRef,
 } from 'react';
 
 import {
@@ -53,14 +52,6 @@ export function useInstanceConnection() {
     setAddress: api.setAddress,
     resetAddress: api.resetAddress,
   };
-}
-
-export function DEPRECATEDuseInstanceData(path) {
-  const { instance } = useCitySkiesState();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  return [data, loading];
 }
 
 export function useInstanceData(get, ...args) {
@@ -139,5 +130,21 @@ export function useInstanceOutputStackLayer(stackId, layerId) {
     getOutputStackLayer,
   }] = useCitySkiesApi();
   const state = useInstanceData(getOutputStackLayer, stackId, layerId);
+  return state;
+}
+
+export function useInstanceOutputStackLayerVariable(stackId, layerId, variableId) {
+  const [, {
+    getOutputStackLayerVariable,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getOutputStackLayerVariable, stackId, layerId, variableId);
+  return state;
+}
+
+export function useInstanceOutputStackLayerStandardVariable(stackId, layerId, variableId) {
+  const [, {
+    getOutputStackLayerStandardVariable,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getOutputStackLayerStandardVariable, stackId, layerId, variableId);
   return state;
 }

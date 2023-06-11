@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import {
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   ScrollView,
 } from 'react-native';
@@ -12,9 +13,12 @@ import {
   Navigate,
   Route,
   Routes,
+  useNavigate,
 } from 'react-router-native';
 
-import Layer from 'src/pages/layers';
+import {
+  LayerViewStack,
+} from 'src/components/layer';
 
 import {
   useInstanceOutput,
@@ -49,6 +53,7 @@ const styles = StyleSheet.create({
  * @returns Stack component.
  */
 function Stack({ id }) {
+  const navigate = useNavigate();
   const [data, loading] = useInstanceOutputStack(id);
 
   if (loading === true) {
@@ -72,7 +77,13 @@ function Stack({ id }) {
       <ScrollView>
         {ids.map((layerId) => (
           <React.Fragment key={`layer.${layerId}`}>
-            <Layer stackId={id} id={layerId} />
+            <TouchableOpacity
+              onPress={() => {
+                navigate(`/layer/${id}/${layerId}`);
+              }}
+            >
+              <LayerViewStack stackId={id} id={layerId} />
+            </TouchableOpacity>
           </React.Fragment>
         ))}
       </ScrollView>
