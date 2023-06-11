@@ -34,7 +34,7 @@ function BooleanVariable({ info }) {
     data: {
       tags,
     },
-    ['default']: defaultValue,
+    default: defaultValue,
     description,
     name,
     typecode,
@@ -60,7 +60,7 @@ function IntegerVariable({ info }) {
       default_range: defaultRange,
       allowed_range: allowedRange,
     },
-    ['default']: defaultValue,
+    default: defaultValue,
     description,
     name,
     typecode,
@@ -87,7 +87,7 @@ function FloatingVariable({ info }) {
       default_range: defaultRange,
       allowed_range: allowedRange,
     },
-    ['default']: defaultValue,
+    default: defaultValue,
     description,
     name,
     typecode,
@@ -114,7 +114,7 @@ function OptionVariable({ info }) {
       default_range: defaultRange,
       allowed_range: allowedRange,
     },
-    ['default']: defaultValue,
+    default: defaultValue,
     description,
     name,
     typecode,
@@ -152,7 +152,7 @@ function ColorPaletteVariable({ info }) {
       default_range: defaultRange,
       allowed_range: allowedRange,
     },
-    ['default']: defaultValue,
+    default: defaultValue,
     description,
     name,
     typecode,
@@ -197,7 +197,7 @@ function ColorPaletteVariable({ info }) {
 
 function StringVariable({ info }) {
   const {
-    ['default']: defaultValue,
+    default: defaultValue,
     description,
     name,
     typecode,
