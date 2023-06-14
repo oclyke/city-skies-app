@@ -13,7 +13,6 @@ import {
   Surface,
   Button,
   Text,
-  useTheme,
 } from 'react-native-paper';
 
 import {
@@ -51,7 +50,6 @@ const styles = StyleSheet.create({
 });
 
 export default function Navigation() {
-  const theme = useTheme();
   const {
     connected,
   } = useInstanceConnection();

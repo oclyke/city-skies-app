@@ -138,7 +138,6 @@ export default function Shards() {
                 title="add"
                 onPress={() => {
                   addOutputStackLayer(active, { shard_uuid: shard })
-                    .then(() => console.log('added'))
                     .catch(console.error);
                 }}
               />

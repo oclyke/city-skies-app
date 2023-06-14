@@ -132,23 +132,36 @@ export default class CitySkiesInstance {
           ),
           setOutputStackLayerVariable: (stack, layer, variable, value) => (
             fetchPathJson(paths.outputStackLayerVariable(stack, layer, variable), { method: 'PUT', body: JSON.stringify({ value }) })
+              .then(async (d) => {
+                // update the cached output stack layer data
+                fetchPathJson(paths.outputStackLayerVariable(stack, layer, variable), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached layer variable data', e));
+                return d;
+              })
           ),
           setOutputStackLayerStandardVariable: (stack, layer, variable, value) => (
             fetchPathJson(paths.outputStackLayerStandardVariable(stack, layer, variable), { method: 'PUT', body: JSON.stringify({ value }) })
+              .then(async (d) => {
+                // update the cached output stack layer data
+                fetchPathJson(paths.outputStackLayerStandardVariable(stack, layer, variable), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached layer standard variable data', e));
+                return d;
+              })
           ),
 
           // deleters
-          removeOutputStackLayer: (stack, layer) => {
-            console.log('removing output stack layer', stack, layer);
-            return fetchPathJson(paths.outputStackLayer(stack, layer), { method: 'DELETE' })
+          removeOutputStackLayer: (stack, layer) => (
+            fetchPathJson(paths.outputStackLayer(stack, layer), { method: 'DELETE' })
               .then(async (d) => {
                 // update the cached output stack data
                 fetchPathJson(paths.outputStack(stack), { method: 'GET' })
                   .then(([path, data]) => this.cache.store(path, data))
                   .catch((e) => console.error('error updating the cached output data', e));
                 return d;
-              });
-          },
+              })
+          ),
 
           // modifiers
           activateOutputStack: (stack) => (

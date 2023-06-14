@@ -118,7 +118,6 @@ export default function Connection() {
       <Button
         title="confirm"
         onPress={() => {
-          console.log('address setting function', setAddress);
           setAddress(`${desiredHost}:${desiredPort}`);
         }}
       />

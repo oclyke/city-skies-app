@@ -109,7 +109,6 @@ export function LayerViewStack({ stackId, id }) {
               icon="delete"
               onPress={() => {
                 removeOutputStackLayer(stackId, id)
-                  .then(() => console.log('successfully removed layer', id))
                   .catch(console.error);
               }}
             />

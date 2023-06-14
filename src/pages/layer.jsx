@@ -3,13 +3,13 @@ import React from 'react';
 import {
   StyleSheet,
   View,
-  Text,
   ScrollView,
 } from 'react-native';
 
 import {
   Surface,
   Switch,
+  Text,
 } from 'react-native-paper';
 
 import {
@@ -48,7 +48,9 @@ const styles = StyleSheet.create({
 
 function StandardVariable({ stackId, layerId, variableId }) {
   const [info, loading] = useInstanceOutputStackLayerStandardVariable(stackId, layerId, variableId);
-
+  const [, {
+    setOutputStackLayerStandardVariable,
+  }] = useInstanceApi();
   if (loading === true) {
     return (
       <Text>Loading</Text>
@@ -56,12 +58,21 @@ function StandardVariable({ stackId, layerId, variableId }) {
   }
 
   return (
-    <Variable info={info} />
+    <Variable
+      info={info}
+      onChange={(value) => {
+        setOutputStackLayerStandardVariable(stackId, layerId, variableId, value)
+          .catch(console.error);
+      }}
+    />
   );
 }
 
 function CustomVariable({ stackId, layerId, variableId }) {
   const [info, loading] = useInstanceOutputStackLayerVariable(stackId, layerId, variableId);
+  const [, {
+    setOutputStackLayerVariable,
+  }] = useInstanceApi();
 
   if (loading === true) {
     return (
@@ -70,7 +81,13 @@ function CustomVariable({ stackId, layerId, variableId }) {
   }
 
   return (
-    <Variable info={info} />
+    <Variable
+      info={info}
+      onChange={(value) => {
+        setOutputStackLayerVariable(stackId, layerId, variableId, value)
+          .catch(console.error);
+      }}
+    />
   );
 }
 
@@ -113,6 +130,7 @@ export default function Layer() {
       <ScrollView>
         <SafeHeader />
 
+        <Text variant="titleLarge">Layer Config</Text>
         <Surface elevation={2} style={styles.surface}>
 
           <Text>{`Shard: ${shardId}`}</Text>
@@ -139,23 +157,25 @@ export default function Layer() {
             />
           </View>
 
-          <Text />
-          <Text>Standard Variables</Text>
-          {standardVariableIds.map((variableId) => (
-            <React.Fragment key={variableId}>
-              <StandardVariable stackId={stackId} layerId={layerId} variableId={variableId} />
-            </React.Fragment>
-          ))}
-
-          <Text />
-          <Text>Variables</Text>
-          {variableIds.map((variableId) => (
-            <React.Fragment key={variableId}>
-              <CustomVariable stackId={stackId} layerId={layerId} variableId={variableId} />
-            </React.Fragment>
-          ))}
-
         </Surface>
+
+        <Text variant="titleLarge">Standard Variables</Text>
+        {standardVariableIds.map((variableId) => (
+          <React.Fragment key={variableId}>
+            <Surface elevation={2} style={styles.surface}>
+              <StandardVariable stackId={stackId} layerId={layerId} variableId={variableId} />
+            </Surface>
+          </React.Fragment>
+        ))}
+
+        <Text variant="titleLarge">Variables</Text>
+        {variableIds.map((variableId) => (
+          <React.Fragment key={variableId}>
+            <Surface elevation={2} style={styles.surface}>
+              <CustomVariable stackId={stackId} layerId={layerId} variableId={variableId} />
+            </Surface>
+          </React.Fragment>
+        ))}
 
         <SafeFooter />
 

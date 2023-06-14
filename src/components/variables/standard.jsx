@@ -1,17 +1,23 @@
 import React from 'react';
 import {
   View,
-  Text,
 } from 'react-native';
+
+import {
+  Text,
+  RadioButton,
+  Button,
+} from 'react-native-paper';
 
 import Slider from '@react-native-community/slider';
 
 import ColorConvert from 'color-convert';
 
-function GenericVariable({ info }) {
+// eslint-disable-next-line no-unused-vars
+function GenericVariable({ info, onChange }) {
   const {
     description,
-    name,
+    id,
     typecode,
     value,
   } = info;
@@ -19,7 +25,7 @@ function GenericVariable({ info }) {
   return (
     <View>
       <Text>Unknown variable type!</Text>
-      <Text>{`Name: ${name}`}</Text>
+      <Text>{`Name: ${id}`}</Text>
       <Text>{`Value: ${value}`}</Text>
       <Text>{`Typecode: ${typecode}`}</Text>
       <Text>{`Description: ${description}`}</Text>
@@ -34,7 +40,7 @@ function BooleanVariable({ info }) {
     },
     default: defaultValue,
     description,
-    name,
+    id,
     typecode,
     value,
   } = info;
@@ -42,7 +48,7 @@ function BooleanVariable({ info }) {
   return (
     <View>
       <Text>Boolean Variable:</Text>
-      <Text>{`Name: ${name}`}</Text>
+      <Text>{`Name: ${id}`}</Text>
       <Text>{`Value: ${value}`}</Text>
       <Text>{`Default: ${defaultValue}`}</Text>
       <Text>{`Typecode: ${typecode}`}</Text>
@@ -60,7 +66,7 @@ function IntegerVariable({ info }) {
     },
     default: defaultValue,
     description,
-    name,
+    id,
     typecode,
     value,
   } = info;
@@ -68,7 +74,7 @@ function IntegerVariable({ info }) {
   return (
     <View>
       <Text>Integer Variable:</Text>
-      <Text>{`Name: ${name}`}</Text>
+      <Text>{`Name: ${id}`}</Text>
       <Text>{`Value: ${value}`}</Text>
       <Text>{`Default: ${defaultValue}`}</Text>
       <Text>{`Typecode: ${typecode}`}</Text>
@@ -79,61 +85,72 @@ function IntegerVariable({ info }) {
   );
 }
 
-function FloatingVariable({ info }) {
+function FloatingVariable({ info, onChange }) {
   const {
     data: {
       default_range: defaultRange,
-      allowed_range: allowedRange,
+      // allowed_range: allowedRange,
     },
     default: defaultValue,
-    description,
-    name,
-    typecode,
     value,
   } = info;
 
+  const [min, max] = defaultRange;
+
   return (
     <View>
-      <Text>Floating Variable:</Text>
-      <Text>{`Name: ${name}`}</Text>
-      <Text>{`Value: ${value}`}</Text>
-      <Text>{`Default: ${defaultValue}`}</Text>
-      <Text>{`Typecode: ${typecode}`}</Text>
-      <Text>{`Allowed Range: ${allowedRange}`}</Text>
-      <Text>{`Default Range: ${defaultRange}`}</Text>
-      <Text>{`Description: ${description}`}</Text>
+      <Text>{`[${min}, ${max}]: ${value}`}</Text>
 
       <Slider
-        minimumValue={0}
-        maximumValue={1}
+        value={parseFloat(value)}
+        minimumValue={min}
+        maximumValue={max}
+        onSlidingComplete={(val) => {
+          let updated = val;
+          if (val < min) { updated = min; }
+          if (val > max) { updated = max; }
+          onChange(`${updated}`);
+        }}
+      />
+
+      <Button
+        onPress={() => onChange(defaultValue)}
+        icon="backup-restore"
       />
     </View>
   );
 }
 
-function OptionVariable({ info }) {
+function OptionVariable({ info, onChange }) {
   const {
     data: {
-      default_range: defaultRange,
-      allowed_range: allowedRange,
+      options,
     },
     default: defaultValue,
-    description,
-    name,
-    typecode,
     value,
   } = info;
 
   return (
     <View>
-      <Text>Option Variable:</Text>
-      <Text>{`Name: ${name}`}</Text>
-      <Text>{`Value: ${value}`}</Text>
-      <Text>{`Default: ${defaultValue}`}</Text>
-      <Text>{`Typecode: ${typecode}`}</Text>
-      <Text>{`Allowed Range: ${allowedRange}`}</Text>
-      <Text>{`Default Range: ${defaultRange}`}</Text>
-      <Text>{`Description: ${description}`}</Text>
+
+      {options.map((option) => (
+        <React.Fragment key={option}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text>{option}</Text>
+            <RadioButton
+              value={option}
+              status={(value === option) ? 'checked' : 'unchecked'}
+              onPress={() => onChange(option)}
+            />
+          </View>
+        </React.Fragment>
+      ))}
+
+      <Button
+        onPress={() => onChange(defaultValue)}
+        icon="backup-restore"
+      />
+
     </View>
   );
 }
@@ -157,7 +174,7 @@ function ColorPaletteVariable({ info }) {
     },
     default: defaultValue,
     description,
-    name,
+    id,
     typecode,
     value,
   } = info;
@@ -174,7 +191,7 @@ function ColorPaletteVariable({ info }) {
   return (
     <View>
       <Text>Color Palette Variable:</Text>
-      <Text>{`Name: ${name}`}</Text>
+      <Text>{`Name: ${id}`}</Text>
       <Text>{`Value: ${{ colors, mapType }}`}</Text>
       <Text>{`Default: ${defaultValue}`}</Text>
       <Text>{`Typecode: ${typecode}`}</Text>
@@ -202,7 +219,7 @@ function StringVariable({ info }) {
   const {
     default: defaultValue,
     description,
-    name,
+    id,
     typecode,
     value,
   } = info;
@@ -210,13 +227,25 @@ function StringVariable({ info }) {
   return (
     <View>
       <Text>String Variable:</Text>
-      <Text>{`Name: ${name}`}</Text>
+      <Text>{`Name: ${id}`}</Text>
       <Text>{`Value: ${value}`}</Text>
       <Text>{`Default: ${defaultValue}`}</Text>
       <Text>{`Typecode: ${typecode}`}</Text>
       <Text>{`Description: ${description}`}</Text>
     </View>
   );
+}
+
+function getSpecializedVariable(typecode) {
+  switch (typecode) {
+    case 1: return BooleanVariable;
+    case 2: return IntegerVariable;
+    case 3: return FloatingVariable;
+    case 4: return OptionVariable;
+    case 5: return ColorPaletteVariable;
+    case 6: return StringVariable;
+    default: return GenericVariable;
+  }
 }
 
 /**
@@ -226,16 +255,23 @@ function StringVariable({ info }) {
  * }
  * @returns
  */
-export function Variable({ info }) {
-  const { typecode } = info;
+export function Variable({ info, onChange }) {
+  const {
+    typecode,
+    id,
+    description,
+  } = info;
+  const SpecializedVariable = getSpecializedVariable(typecode);
 
-  switch (typecode) {
-    case 1: return <BooleanVariable info={info} />;
-    case 2: return <IntegerVariable info={info} />;
-    case 3: return <FloatingVariable info={info} />;
-    case 4: return <OptionVariable info={info} />;
-    case 5: return <ColorPaletteVariable info={info} />;
-    case 6: return <StringVariable info={info} />;
-    default: return <GenericVariable info={info} />;
+  function handleChange(value) {
+    onChange?.(value);
   }
+
+  return (
+    <>
+      <Text variant="titleMedium">{id}</Text>
+      <Text>{description}</Text>
+      <SpecializedVariable info={info} onChange={(value) => { handleChange(value); }} />
+    </>
+  );
 }
