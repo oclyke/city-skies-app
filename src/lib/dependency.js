@@ -220,7 +220,7 @@ export default class DependencyGraph {
   }
 }
 
-function layersEquivalent (xs, ys) {
+function layersEquivalent(xs, ys) {
   return (
     xs.length === ys.length
     && [...xs].every((x) => ys.includes(x)));
@@ -297,6 +297,7 @@ function testSort() {
   return true;
 }
 
+// eslint-disable-next-line no-unused-vars
 function runTests() {
   const tests = [
     testSelfReference,

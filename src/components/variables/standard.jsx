@@ -86,6 +86,7 @@ function IntegerVariable({ info, onChange }) {
   let [min, max] = defaultRange;
   if (minText !== '') { min = parseInt(minText, 10); }
   if (maxText !== '') { max = parseInt(maxText, 10); }
+  if (min > max) { [min, max] = [max, min]; }
 
   if ((typeof allowedRange !== 'undefined')
     && (allowedRange !== null)
@@ -147,8 +148,15 @@ function FloatingVariable({ info, onChange }) {
   } = info;
 
   let [min, max] = defaultRange;
-  if (minText !== '') { min = parseFloat(minText); }
-  if (maxText !== '') { max = parseFloat(maxText); }
+  if (minText !== '') {
+    const result = parseFloat(minText);
+    if (!Number.isNaN(result)) { min = result; }
+  }
+  if (maxText !== '') {
+    const result = parseFloat(maxText);
+    if (!Number.isNaN(result)) { max = result; }
+  }
+  if (min > max) { [min, max] = [max, min]; }
 
   if ((typeof allowedRange !== 'undefined')
     && (allowedRange !== null)
