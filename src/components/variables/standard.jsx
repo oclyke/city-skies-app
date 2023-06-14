@@ -5,6 +5,7 @@ import React, {
 
 import {
   View,
+  TextInput as NativeTextInput,
 } from 'react-native';
 
 import {
@@ -71,20 +72,52 @@ function BooleanVariable({ info, onChange }) {
 }
 
 function IntegerVariable({ info, onChange }) {
+  const [minText, setMinText] = useState('');
+  const [maxText, setMaxText] = useState('');
+
   const {
     data: {
       default_range: defaultRange,
-      // allowed_range: allowedRange,
+      allowed_range: allowedRange,
     },
     value,
   } = info;
 
-  const [min, max] = defaultRange;
+  let [min, max] = defaultRange;
+  if (minText !== '') { min = parseInt(minText, 10); }
+  if (maxText !== '') { max = parseInt(maxText, 10); }
+
+  if ((typeof allowedRange !== 'undefined')
+    && (allowedRange !== null)
+    && (allowedRange.length === 2)) {
+    const [minAllowed, maxAllowed] = allowedRange;
+    if (min < minAllowed) { min = minAllowed; }
+    if (max > maxAllowed) { max = maxAllowed; }
+  }
 
   return (
     <View>
-      <Text>{`[${min}, ${max}]: ${value}`}</Text>
 
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ flex: 1 }}>
+          <NativeTextInput
+            label="Min"
+            value={minText}
+            onChangeText={setMinText}
+            placeholder="min value"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <NativeTextInput
+            label="Max"
+            value={maxText}
+            onChangeText={setMaxText}
+            placeholder="max value placeholder"
+          />
+        </View>
+      </View>
+
+      <Text>{`[${min}, ${max}]: ${value}`}</Text>
       <Slider
         value={parseInt(value, 10)}
         minimumValue={min}
@@ -102,18 +135,51 @@ function IntegerVariable({ info, onChange }) {
 }
 
 function FloatingVariable({ info, onChange }) {
+  const [minText, setMinText] = useState('');
+  const [maxText, setMaxText] = useState('');
+
   const {
     data: {
       default_range: defaultRange,
-      // allowed_range: allowedRange,
+      allowed_range: allowedRange,
     },
     value,
   } = info;
 
-  const [min, max] = defaultRange;
+  let [min, max] = defaultRange;
+  if (minText !== '') { min = parseFloat(minText); }
+  if (maxText !== '') { max = parseFloat(maxText); }
+
+  if ((typeof allowedRange !== 'undefined')
+    && (allowedRange !== null)
+    && (allowedRange.length === 2)) {
+    const [minAllowed, maxAllowed] = allowedRange;
+    if (min < minAllowed) { min = minAllowed; }
+    if (max > maxAllowed) { max = maxAllowed; }
+  }
 
   return (
     <View>
+
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ flex: 1 }}>
+          <NativeTextInput
+            label="Min"
+            value={minText}
+            onChangeText={setMinText}
+            placeholder="min value"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <NativeTextInput
+            label="Max"
+            value={maxText}
+            onChangeText={setMaxText}
+            placeholder="max value placeholder"
+          />
+        </View>
+      </View>
+
       <Text>{`[${min}, ${max}]: ${value}`}</Text>
 
       <Slider
