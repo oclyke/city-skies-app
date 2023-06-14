@@ -112,6 +112,17 @@ export function useInstanceOutput() {
   return state;
 }
 
+export function useInstanceOutputActiveInactiveStacks() {
+  const [data, loading] = useInstanceOutput();
+  let active = 'A';
+  let inactive = 'B';
+  if (loading === false) {
+    active = data.stacks.active;
+    inactive = (active === 'A') ? 'B' : 'A';
+  }
+  return [active, inactive];
+}
+
 /**
  * Hook for output stack data from the instance.
  * @param {*} stackId the id of the stack to get.

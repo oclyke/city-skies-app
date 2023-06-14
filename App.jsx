@@ -6,12 +6,17 @@ import {
 
 import {
   PaperProvider,
+  MD3LightTheme as DefaultTheme,
 } from 'react-native-paper';
 
 import CitySkiesProvider from 'src/providers/citySkies';
 import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
 import CitySkiesInterface from 'src/lib/citySkies';
 import App from 'src/app';
+
+const theme = {
+  ...DefaultTheme,
+};
 
 const instance = new CitySkiesInterface('localhost:1337');
 
@@ -27,7 +32,7 @@ export default function Main() {
             { name: 'Home', address: '127.0.0.1:1337' },
           ]}
         >
-          <PaperProvider>
+          <PaperProvider theme={theme}>
             <App />
           </PaperProvider>
         </FavoriteConnectionsProvider>

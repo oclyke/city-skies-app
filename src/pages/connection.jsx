@@ -11,6 +11,10 @@ import {
 } from 'react-native';
 
 import {
+  withSafeHeaderStyles,
+} from 'src/components/safeHeader';
+
+import {
   useFavoriteConnectionsApi,
   useFavoriteConnectionsState,
 } from 'src/providers/favoriteConnections';
@@ -18,6 +22,9 @@ import {
 import {
   useInstanceConnection,
 } from 'src/hooks/citySkies';
+
+// create a safe header that will bump the content down below the main header
+const SafeHeader = withSafeHeaderStyles(View);
 
 const styles = StyleSheet.create({
   error: {
@@ -77,6 +84,7 @@ export default function Connection() {
 
   return (
     <>
+      <SafeHeader />
       <Text>Connection Page</Text>
       <Text>Connection Status:</Text>
       <Text style={connected ? styles.success : styles.error}>{connected ? 'connected' : 'not connected'}</Text>
@@ -110,7 +118,7 @@ export default function Connection() {
       <Button
         title="confirm"
         onPress={() => {
-          console.log('address setting function', setAddress)
+          console.log('address setting function', setAddress);
           setAddress(`${desiredHost}:${desiredPort}`);
         }}
       />

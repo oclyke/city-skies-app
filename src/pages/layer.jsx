@@ -10,6 +10,10 @@ import {
 } from 'react-router-native';
 
 import {
+  withSafeHeaderStyles,
+} from 'src/components/safeHeader';
+
+import {
   useInstanceOutputStackLayer,
   useInstanceOutputStackLayerVariable,
   useInstanceOutputStackLayerStandardVariable,
@@ -22,6 +26,9 @@ import {
 import {
   Variable,
 } from 'src/components/variables';
+
+// create a safe header that will bump the content down below the main header
+const SafeHeader = withSafeHeaderStyles(View);
 
 function StandardVariable({ stackId, layerId, variableId }) {
   const [info, loading] = useInstanceOutputStackLayerStandardVariable(stackId, layerId, variableId);
@@ -79,6 +86,7 @@ export default function Layer() {
 
   return (
     <View>
+      <SafeHeader />
       <LayerConfig config={config} />
 
       <Text />

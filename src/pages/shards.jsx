@@ -18,7 +18,14 @@ import {
   useInstanceApi,
 } from 'src/hooks/citySkies';
 
+import {
+  withSafeHeaderStyles,
+} from 'src/components/safeHeader';
+
 import KVStore from 'src/lib/kvstore';
+
+// create a safe header that will bump the content down below the main header
+const SafeHeader = withSafeHeaderStyles(View);
 
 const styles = StyleSheet.create({
   container: {
@@ -104,7 +111,10 @@ export default function Shards() {
 
   if ((outputLoading === true) || (shardsLoading === true)) {
     return (
-      <Text>Loading</Text>
+      <>
+        <SafeHeader />
+        <Text>Loading</Text>
+      </>
     );
   }
 
@@ -115,6 +125,7 @@ export default function Shards() {
 
   return (
     <>
+      <SafeHeader />
       <Text>Shards Page</Text>
       <ScrollView style={styles.container}>
         {modules.map((shard) => (

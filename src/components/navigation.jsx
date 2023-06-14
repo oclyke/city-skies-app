@@ -2,32 +2,45 @@ import React from 'react';
 
 import {
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 
 import {
-  Link,
+  useNavigate,
 } from 'react-router-native';
 
 import {
+  Surface,
+  Button,
+  Text,
+} from 'react-native-paper';
+
+import {
   useInstanceConnection,
+  useInstanceOutputActiveInactiveStacks,
 } from 'src/hooks/citySkies';
 
-const navUnderlayColor = '#f0f4f7';
-
 const styles = StyleSheet.create({
+  surface: {
+    height: 50,
+    borderRadius: 30,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  vcenter: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
   nav: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    paddingRight: 10,
+    paddingLeft: 10,
   },
-  navItem: {
+  navButton: {
     flex: 1,
     alignItems: 'center',
-    padding: 10,
-  },
-  subNavItem: {
-    padding: 5,
   },
   circle: {
     height: 10,
@@ -40,38 +53,55 @@ export default function Navigation() {
   const {
     connected,
   } = useInstanceConnection();
+  const [activeStackId] = useInstanceOutputActiveInactiveStacks();
+  const navigate = useNavigate();
 
   return (
-    <View style={styles.nav}>
-      <Link
-        to="/stacks"
-        underlayColor={navUnderlayColor}
-        style={styles.navItem}
-      >
-        <Text>Stacks</Text>
-      </Link>
-      <Link
-        to="/shards"
-        underlayColor={navUnderlayColor}
-        style={styles.navItem}
-      >
-        <Text>Shards</Text>
-      </Link>
-      <Link
-        to="/connection"
-        underlayColor={navUnderlayColor}
-        style={styles.navItem}
-      >
-        <View>
-          <Text>Connection</Text>
-          <View
-            style={{
-              ...styles.circle,
-              backgroundColor: (connected) ? 'green' : 'red',
+    <Surface elevation={4} style={styles.surface}>
+      <View style={styles.vcenter}>
+        <View style={styles.nav}>
+
+          {/* stacks */}
+          <Button
+            style={styles.navButton}
+            icon="layers-triple"
+            onPress={() => {
+              navigate(`/stack/${activeStackId}`);
             }}
-          />
+          >
+            <Text>Layers</Text>
+          </Button>
+
+          {/* shards */}
+          <Button
+            style={styles.navButton}
+            icon="layers-plus"
+            onPress={() => {
+              navigate('/shards');
+            }}
+          >
+            <Text>Shards</Text>
+          </Button>
+
+          {/* connection */}
+          <Button
+            style={styles.navButton}
+            icon="devices"
+            onPress={() => {
+              navigate('/connection');
+            }}
+          >
+            <Text>Connection</Text>
+            <View
+              style={{
+                ...styles.circle,
+                backgroundColor: (connected) ? 'green' : 'red',
+              }}
+            />
+          </Button>
+
         </View>
-      </Link>
-    </View>
+      </View>
+    </Surface>
   );
 }

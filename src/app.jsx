@@ -3,8 +3,15 @@ import React from 'react';
 import {
   StyleSheet,
   View,
-  SafeAreaView,
 } from 'react-native';
+
+import {
+  StatusBar,
+} from 'expo-status-bar';
+
+import {
+  useTheme,
+} from 'react-native-paper';
 
 import {
   Route,
@@ -13,17 +20,24 @@ import {
   Navigate,
 } from 'react-router-native';
 
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+
 import Connection from 'src/pages/connection';
-import Stacks from 'src/pages/stacks';
+import Stack from 'src/pages/stack';
 import Shards from 'src/pages/shards';
 import Layer from 'src/pages/layer';
 
 import Navigation from 'src/components/navigation';
 
+import {
+  withSafeHeaderStyles,
+} from 'src/components/safeHeader';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   main: {
     flex: 1,
@@ -31,7 +45,28 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
+  header: {
+    flexDirection: 'row',
+    position: 'absolute',
+    width: '100%',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  bar: {
+    flex: 1,
+    borderRadius: '30 30 0 0',
+  },
+  content: {
+
+  },
+  nav: {
+    width: '100%',
+    position: 'absolute',
+  },
 });
+
+// create a safe header view that will cover the outlet at the top of the screens
+const SafeHeader = withSafeHeaderStyles(View);
 
 /**
  * The global app layout. Provides:
@@ -43,12 +78,44 @@ const styles = StyleSheet.create({
  * @returns Global layout for the app.
  */
 function Layout() {
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.main}>
+      <StatusBar translucent backgroundColor="transparent" style="light" />
+
+      {/* the main view is allowed to go out of the safe area in top-bottom directions */}
+      <View
+        style={{
+          ...styles.main,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        }}
+      >
         <Outlet />
+      </View>
+
+      {/* navigation view is outside safe area and positioned back over  */}
+      <View
+        style={{
+          ...styles.nav,
+          bottom: insets.bottom,
+        }}
+      >
         <Navigation />
-      </SafeAreaView>
+      </View>
+
+      {/* header is positioned outside the safe area */}
+      <SafeHeader style={styles.header}>
+        <View
+          style={{
+            ...styles.bar,
+            backgroundColor: theme.colors.primary,
+          }}
+        />
+      </SafeHeader>
+
     </View>
   );
 }
@@ -59,10 +126,10 @@ export default function App() {
       <Route path="/" element={<Layout />}>
         <Route path="connection" element={<Connection />} />
         <Route path="shards/*" element={<Shards />} />
-        <Route path="stacks/*" element={<Stacks />} />
+        <Route path="stack/:stackId" element={<Stack />} />
         <Route path="layer/:stackId/:layerId" element={<Layer />} />
       </Route>
-      <Route index element={<Navigate replace to="/stacks" />} />
+      <Route index element={<Navigate replace to="/stack/A" />} />
     </Routes>
   );
 }
