@@ -9,6 +9,8 @@ import {
   Surface,
   Button,
   Text,
+  Switch,
+  useTheme,
 } from 'react-native-paper';
 
 import {
@@ -45,8 +47,10 @@ export function LayerConfig({ config }) {
 }
 
 export function LayerViewStack({ stackId, id }) {
+  const theme = useTheme();
   const [, {
     removeOutputStackLayer,
+    mergeOutputStackLayerConfig,
   }] = useInstanceApi();
   const [data, loading] = useInstanceOutputStackLayer(stackId, id);
 
@@ -58,12 +62,20 @@ export function LayerViewStack({ stackId, id }) {
 
   const {
     config: {
+      active,
+      use_local_palette: useLocalPalette,
       shard_uuid: shardId,
     },
   } = data;
 
+  // create dynamic style to indicate whether the layer is active
+  const dynamicStyle = {};
+  if (active === false) {
+    dynamicStyle.backgroundColor = theme.colors.tertiary;
+  }
+
   return (
-    <Surface elevation={2} style={styles.surface}>
+    <Surface elevation={2} style={{ ...styles.surface, ...dynamicStyle }}>
 
       {/* allow for two columns */}
       <View style={{ flexDirection: 'row' }}>
@@ -76,6 +88,22 @@ export function LayerViewStack({ stackId, id }) {
         {/* column 2 */}
         <View style={{ flexDirection: 'column', height: '100%'}}>
           <View style={{ flexDirection: 'row' }}>
+
+            <Switch
+              value={active}
+              onValueChange={() => {
+                mergeOutputStackLayerConfig(stackId, id, { active: !active })
+                  .catch(console.error);
+              }}
+            />
+
+            <Switch
+              value={useLocalPalette}
+              onValueChange={() => {
+                mergeOutputStackLayerConfig(stackId, id, { use_local_palette: !useLocalPalette })
+                  .catch(console.error);
+              }}
+            />
 
             <Button
               icon="delete"

@@ -18,6 +18,7 @@ import {
 
 import {
   withSafeHeaderStyles,
+  withSafeFooterStyles,
 } from 'src/components/safeRegions';
 
 import {
@@ -28,19 +29,20 @@ import {
 } from 'src/hooks/citySkies';
 
 import {
-  LayerConfig,
-} from 'src/components/layer';
-
-import {
   Variable,
 } from 'src/components/variables';
 
 // create a safe header that will bump the content down below the main header
 const SafeHeader = withSafeHeaderStyles(View);
+const SafeFooter = withSafeFooterStyles(View);
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+  },
+  surface: {
+    borderRadius: 10,
+    margin: 10,
   },
 });
 
@@ -78,9 +80,6 @@ export default function Layer() {
     layerId,
   } = useParams();
 
-  console.log('stackId', stackId);
-  console.log('layerId', layerId);
-
   const [, {
     mergeOutputStackLayerConfig,
   }] = useInstanceApi();
@@ -109,62 +108,58 @@ export default function Layer() {
     },
   } = data;
 
-  const {
-    config
-  } = data;
-
   return (
     <View style={styles.container}>
-      <View style={{ margin: 10 }}>
-        <ScrollView>
-          <SafeHeader />
+      <ScrollView>
+        <SafeHeader />
 
-          <Surface>
+        <Surface elevation={2} style={styles.surface}>
 
-            <Text>{`Shard: ${shardId}`}</Text>
+          <Text>{`Shard: ${shardId}`}</Text>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-              <Text>Active: </Text>
-              <Switch
-                value={active}
-                onValueChange={() => {
-                  mergeOutputStackLayerConfig(stackId, layerId, { active: !active })
-                    .catch(console.error);
-                }}
-              />
-            </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+            <Text>Active: </Text>
+            <Switch
+              value={active}
+              onValueChange={() => {
+                mergeOutputStackLayerConfig(stackId, layerId, { active: !active })
+                  .catch(console.error);
+              }}
+            />
+          </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-              <Text>Use Local Palette: </Text>
-              <Switch
-                value={useLocalPalette}
-                onValueChange={() => {
-                  mergeOutputStackLayerConfig(stackId, layerId, { use_local_palette: !useLocalPalette })
-                    .catch(console.error);
-                }}
-              />
-            </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+            <Text>Use Local Palette: </Text>
+            <Switch
+              value={useLocalPalette}
+              onValueChange={() => {
+                mergeOutputStackLayerConfig(stackId, layerId, { use_local_palette: !useLocalPalette })
+                  .catch(console.error);
+              }}
+            />
+          </View>
 
-            <Text />
-            <Text>Standard Variables</Text>
-            {standardVariableIds.map((variableId) => (
-              <React.Fragment key={variableId}>
-                <StandardVariable stackId={stackId} layerId={layerId} variableId={variableId} />
-              </React.Fragment>
-            ))}
+          <Text />
+          <Text>Standard Variables</Text>
+          {standardVariableIds.map((variableId) => (
+            <React.Fragment key={variableId}>
+              <StandardVariable stackId={stackId} layerId={layerId} variableId={variableId} />
+            </React.Fragment>
+          ))}
 
-            <Text />
-            <Text>Variables</Text>
-            {variableIds.map((variableId) => (
-              <React.Fragment key={variableId}>
-                <CustomVariable stackId={stackId} layerId={layerId} variableId={variableId} />
-              </React.Fragment>
-            ))}
+          <Text />
+          <Text>Variables</Text>
+          {variableIds.map((variableId) => (
+            <React.Fragment key={variableId}>
+              <CustomVariable stackId={stackId} layerId={layerId} variableId={variableId} />
+            </React.Fragment>
+          ))}
 
-          </Surface>
+        </Surface>
 
-        </ScrollView>
-      </View>
+        <SafeFooter />
+
+      </ScrollView>
     </View>
   );
 }

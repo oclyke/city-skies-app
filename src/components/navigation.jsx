@@ -13,6 +13,7 @@ import {
   Surface,
   Button,
   Text,
+  useTheme,
 } from 'react-native-paper';
 
 import {
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Navigation() {
+  const theme = useTheme();
   const {
     connected,
   } = useInstanceConnection();
@@ -63,6 +65,7 @@ export default function Navigation() {
 
           {/* stacks */}
           <Button
+            // mode="outlined"
             style={styles.navButton}
             icon="layers-triple"
             onPress={() => {
@@ -74,6 +77,7 @@ export default function Navigation() {
 
           {/* shards */}
           <Button
+            // mode="outlined"
             style={styles.navButton}
             icon="layers-plus"
             onPress={() => {
@@ -85,6 +89,7 @@ export default function Navigation() {
 
           {/* connection */}
           <Button
+            // mode="outlined"
             style={styles.navButton}
             icon="devices"
             onPress={() => {
