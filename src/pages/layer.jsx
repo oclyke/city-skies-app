@@ -19,18 +19,12 @@ import {
   LayerConfig,
 } from 'src/components/layer';
 
-function Variable({ data }) {
-  const {
-    name: id,
-  } = data;
-
-  return (
-    <Text>{id}</Text>
-  );
-}
+import {
+  Variable,
+} from 'src/components/variables';
 
 function StandardVariable({ stackId, layerId, variableId }) {
-  const [data, loading] = useInstanceOutputStackLayerStandardVariable(stackId, layerId, variableId);
+  const [info, loading] = useInstanceOutputStackLayerStandardVariable(stackId, layerId, variableId);
 
   if (loading === true) {
     return (
@@ -39,12 +33,12 @@ function StandardVariable({ stackId, layerId, variableId }) {
   }
 
   return (
-    <Variable data={data} />
+    <Variable info={info} />
   );
 }
 
 function CustomVariable({ stackId, layerId, variableId }) {
-  const [data, loading] = useInstanceOutputStackLayerVariable(stackId, layerId, variableId);
+  const [info, loading] = useInstanceOutputStackLayerVariable(stackId, layerId, variableId);
 
   if (loading === true) {
     return (
@@ -53,7 +47,7 @@ function CustomVariable({ stackId, layerId, variableId }) {
   }
 
   return (
-    <Variable data={data} />
+    <Variable info={info} />
   );
 }
 

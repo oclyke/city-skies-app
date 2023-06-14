@@ -4,9 +4,7 @@ import {
   Text,
 } from 'react-native';
 
-import {
-  DEPRECATEDuseInstanceData,
-} from 'src/hooks/citySkies';
+import Slider from '@react-native-community/slider';
 
 import ColorConvert from 'color-convert';
 
@@ -104,6 +102,11 @@ function FloatingVariable({ info }) {
       <Text>{`Allowed Range: ${allowedRange}`}</Text>
       <Text>{`Default Range: ${defaultRange}`}</Text>
       <Text>{`Description: ${description}`}</Text>
+
+      <Slider
+        minimumValue={0}
+        maximumValue={1}
+      />
     </View>
   );
 }
@@ -219,24 +222,11 @@ function StringVariable({ info }) {
 /**
  * Renders variable info from the target at path.
  * @param {
- *  path: the path at which the variable is published on the target
+ *  info: the variable info to render
  * }
  * @returns
  */
-export default function Variable({ path }) {
-  const [info, loading] = DEPRECATEDuseInstanceData(path);
-
-  // show loading state
-  if (loading === true) {
-    return (
-      <View>
-        <Text>Loading</Text>
-        <Text>{path}</Text>
-      </View>
-    );
-  }
-
-  // check the typecode
+export function Variable({ info }) {
   const { typecode } = info;
 
   switch (typecode) {

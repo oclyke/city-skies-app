@@ -12,6 +12,7 @@ module.exports = function (api) {
       ],
     ],
     plugins: [
+      ['react-native-paper/babel'],
       ['@babel/plugin-transform-private-property-in-object', { loose: true }],
       ['@babel/plugin-transform-class-properties', { loose: true }],
       ['module-resolver', {
