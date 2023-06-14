@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -27,6 +28,15 @@ import {
 // create a safe header that will bump the content down below the main header
 const SafeHeader = withSafeHeaderStyles(View);
 
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  layer: {
+    margin: 10,
+  },
+});
+
 /**
  * View a stack from the target.
  * @returns Stack component.
@@ -49,7 +59,7 @@ function StackView({ id }) {
   } = data;
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       <SafeHeader />
       {ids.map((layerId) => (
         <React.Fragment key={`layer.${layerId}`}>
@@ -58,7 +68,9 @@ function StackView({ id }) {
               navigate(`/layer/${id}/${layerId}`);
             }}
           >
-            <LayerViewStack stackId={id} id={layerId} />
+            <View style={styles.layer}>
+              <LayerViewStack stackId={id} id={layerId} />
+            </View>
           </TouchableOpacity>
         </React.Fragment>
       ))}

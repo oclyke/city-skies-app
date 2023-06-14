@@ -1,15 +1,27 @@
 import React from 'react';
 
 import {
+  StyleSheet,
   View,
-  Text,
-  Button,
 } from 'react-native';
+
+import {
+  Surface,
+  Button,
+  Text,
+} from 'react-native-paper';
 
 import {
   useInstanceApi,
   useInstanceOutputStackLayer,
 } from 'src/hooks/citySkies';
+
+const styles = StyleSheet.create({
+  surface: {
+    borderRadius: 10,
+    padding: 5,
+  },
+});
 
 export function LayerConfig({ config }) {
   const {
@@ -45,54 +57,38 @@ export function LayerViewStack({ stackId, id }) {
   }
 
   const {
-    config,
-    variables: {
-      // total: totalVariables,
-      ids: variableIds,
-    },
-    standardVariables: {
-      // total: totalStandardVariables,
-      ids: standardVariableIds,
+    config: {
+      shard_uuid: shardId,
     },
   } = data;
 
   return (
-    <View>
-      <LayerConfig config={config} />
+    <Surface elevation={2} style={styles.surface}>
 
-      <Button
-        title="remove"
-        onPress={() => {
-          removeOutputStackLayer(stackId, id)
-            .then(() => console.log('successfully removed layer', id))
-            .catch(console.error);
-        }}
-      />
+      {/* allow for two columns */}
+      <View style={{ flexDirection: 'row' }}>
 
-      <View>
-        <Text>{`Config: ${config}`}</Text>
+        {/* column 1 */}
+        <View style={{ flexDirection: 'column', flexGrow: 1 }}>
+          <Text>{shardId}</Text>
+        </View>
+
+        {/* column 2 */}
+        <View style={{ flexDirection: 'column', height: '100%'}}>
+          <View style={{ flexDirection: 'row' }}>
+
+            <Button
+              icon="delete"
+              onPress={() => {
+                removeOutputStackLayer(stackId, id)
+                  .then(() => console.log('successfully removed layer', id))
+                  .catch(console.error);
+              }}
+            />
+
+          </View>
+        </View>
       </View>
-
-      <View>
-        <Text>Standard Variables</Text>
-        {standardVariableIds.map((variableId) => (
-          <React.Fragment key={variableId}>
-            <Text>{variableId}</Text>
-            {/* <Variable path={`${path}/private_variable/${variableId}`} /> */}
-          </React.Fragment>
-        ))}
-      </View>
-
-      <View>
-        <Text>Variables</Text>
-        {variableIds.map((variableId) => (
-          <React.Fragment key={variableId}>
-            <Text>{variableId}</Text>
-            {/* <Variable path={`${path}/variable/${variableId}`} /> */}
-          </React.Fragment>
-        ))}
-      </View>
-
-    </View>
+    </Surface>
   );
 }
