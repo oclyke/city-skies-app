@@ -18,20 +18,20 @@ const instance = new CitySkiesInterface('localhost:1337');
 export default function Main() {
   return (
     <NativeRouter>
-      <PaperProvider>
-        <CitySkiesProvider
-          instance={instance}
-          apiVersion="v0"
+      <CitySkiesProvider
+        instance={instance}
+        apiVersion="v0"
+      >
+        <FavoriteConnectionsProvider
+          initial={[
+            { name: 'Home', address: '127.0.0.1:1337' },
+          ]}
         >
-          <FavoriteConnectionsProvider
-            initial={[
-              { name: 'Home', address: '127.0.0.1:1337' },
-            ]}
-          >
+          <PaperProvider>
             <App />
-          </FavoriteConnectionsProvider>
-        </CitySkiesProvider>
-      </PaperProvider>
+          </PaperProvider>
+        </FavoriteConnectionsProvider>
+      </CitySkiesProvider>
     </NativeRouter>
   );
 }
