@@ -151,7 +151,9 @@ export default function Layer() {
             <Switch
               value={useLocalPalette}
               onValueChange={() => {
-                mergeOutputStackLayerConfig(stackId, layerId, { use_local_palette: !useLocalPalette })
+                mergeOutputStackLayerConfig(stackId, layerId, {
+                  use_local_palette: !useLocalPalette,
+                })
                   .catch(console.error);
               }}
             />

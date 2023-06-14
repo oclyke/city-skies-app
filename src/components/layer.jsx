@@ -86,7 +86,7 @@ export function LayerViewStack({ stackId, id }) {
         </View>
 
         {/* column 2 */}
-        <View style={{ flexDirection: 'column', height: '100%'}}>
+        <View style={{ flexDirection: 'column', height: '100%' }}>
           <View style={{ flexDirection: 'row' }}>
 
             <Switch
