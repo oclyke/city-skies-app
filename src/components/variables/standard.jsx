@@ -1,4 +1,8 @@
-import React from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
 import {
   View,
 } from 'react-native';
@@ -7,6 +11,8 @@ import {
   Text,
   RadioButton,
   Button,
+  Switch,
+  TextInput,
 } from 'react-native-paper';
 
 import Slider from '@react-native-community/slider';
@@ -33,54 +39,64 @@ function GenericVariable({ info, onChange }) {
   );
 }
 
-function BooleanVariable({ info }) {
+function BooleanVariable({ info, onChange }) {
   const {
     data: {
       tags,
     },
-    default: defaultValue,
-    description,
-    id,
-    typecode,
-    value,
+    value: stringValue,
   } = info;
+
+  const value = (stringValue === 'True');
+
+  const [off, on] = tags;
 
   return (
     <View>
-      <Text>Boolean Variable:</Text>
-      <Text>{`Name: ${id}`}</Text>
-      <Text>{`Value: ${value}`}</Text>
-      <Text>{`Default: ${defaultValue}`}</Text>
-      <Text>{`Typecode: ${typecode}`}</Text>
-      <Text>{`Tags: ${tags}`}</Text>
-      <Text>{`Description: ${description}`}</Text>
+      <View style={{ flexDirection: 'row' }}>
+
+        <Text>{off}</Text>
+        <Switch
+          value={value}
+          onValueChange={() => {
+            onChange((value) ? 'False' : 'True');
+          }}
+        />
+        <Text>{on}</Text>
+
+      </View>
+
     </View>
   );
 }
 
-function IntegerVariable({ info }) {
+function IntegerVariable({ info, onChange }) {
   const {
     data: {
       default_range: defaultRange,
-      allowed_range: allowedRange,
+      // allowed_range: allowedRange,
     },
-    default: defaultValue,
-    description,
-    id,
-    typecode,
     value,
   } = info;
 
+  const [min, max] = defaultRange;
+
   return (
     <View>
-      <Text>Integer Variable:</Text>
-      <Text>{`Name: ${id}`}</Text>
-      <Text>{`Value: ${value}`}</Text>
-      <Text>{`Default: ${defaultValue}`}</Text>
-      <Text>{`Typecode: ${typecode}`}</Text>
-      <Text>{`Allowed Range: ${allowedRange}`}</Text>
-      <Text>{`Default Range: ${defaultRange}`}</Text>
-      <Text>{`Description: ${description}`}</Text>
+      <Text>{`[${min}, ${max}]: ${value}`}</Text>
+
+      <Slider
+        value={parseInt(value, 10)}
+        minimumValue={min}
+        maximumValue={max}
+        onSlidingComplete={(val) => {
+          let updated = val;
+          if (val < min) { updated = min; }
+          if (val > max) { updated = max; }
+          onChange(`${Math.round(updated)}`);
+        }}
+      />
+
     </View>
   );
 }
@@ -91,7 +107,6 @@ function FloatingVariable({ info, onChange }) {
       default_range: defaultRange,
       // allowed_range: allowedRange,
     },
-    default: defaultValue,
     value,
   } = info;
 
@@ -113,10 +128,6 @@ function FloatingVariable({ info, onChange }) {
         }}
       />
 
-      <Button
-        onPress={() => onChange(defaultValue)}
-        icon="backup-restore"
-      />
     </View>
   );
 }
@@ -126,7 +137,6 @@ function OptionVariable({ info, onChange }) {
     data: {
       options,
     },
-    default: defaultValue,
     value,
   } = info;
 
@@ -145,11 +155,6 @@ function OptionVariable({ info, onChange }) {
           </View>
         </React.Fragment>
       ))}
-
-      <Button
-        onPress={() => onChange(defaultValue)}
-        icon="backup-restore"
-      />
 
     </View>
   );
@@ -215,23 +220,37 @@ function ColorPaletteVariable({ info }) {
   );
 }
 
-function StringVariable({ info }) {
+function StringVariable({ info, onChange }) {
+  const [text, setText] = useState('');
   const {
-    default: defaultValue,
-    description,
     id,
-    typecode,
     value,
   } = info;
 
+  // update text when value changes
+  useEffect(() => {
+    setText(value);
+  }, [value]);
+
   return (
     <View>
-      <Text>String Variable:</Text>
-      <Text>{`Name: ${id}`}</Text>
-      <Text>{`Value: ${value}`}</Text>
-      <Text>{`Default: ${defaultValue}`}</Text>
-      <Text>{`Typecode: ${typecode}`}</Text>
-      <Text>{`Description: ${description}`}</Text>
+
+      <TextInput
+        label={id}
+        value={text}
+        onChangeText={(value) => { setText(value); }}
+      />
+
+      <Button
+        onPress={() => {
+          onChange(text);
+          setText(text);
+        }}
+        // icon="backup-restore"
+      >
+        <Text>Submit</Text>
+      </Button>
+
     </View>
   );
 }
@@ -260,6 +279,7 @@ export function Variable({ info, onChange }) {
     typecode,
     id,
     description,
+    default: defaultValue,
   } = info;
   const SpecializedVariable = getSpecializedVariable(typecode);
 
@@ -272,6 +292,10 @@ export function Variable({ info, onChange }) {
       <Text variant="titleMedium">{id}</Text>
       <Text>{description}</Text>
       <SpecializedVariable info={info} onChange={(value) => { handleChange(value); }} />
+      <Button
+        onPress={() => handleChange(defaultValue)}
+        icon="backup-restore"
+      />
     </>
   );
 }
