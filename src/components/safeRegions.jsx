@@ -23,3 +23,24 @@ export function withSafeHeaderStyles(Component) {
     return <Component {...props} style={style} />;
   };
 }
+
+export function withSafeFooterStyles(Component) {
+  return function inner(props) {
+    const insets = useSafeAreaInsets();
+    const offset = 50;
+    let style;
+    if (typeof props.style !== 'undefined') {
+      style = {
+        ...props.style,
+        height: insets.bottom + offset,
+      };
+    } else {
+      style = {
+        height: insets.bottom + offset,
+      };
+    }
+
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    return <Component {...props} style={style} />;
+  };
+}

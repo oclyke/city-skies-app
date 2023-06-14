@@ -126,7 +126,7 @@ function OptionVariable({ info }) {
 
   return (
     <View>
-      <Text>Floating Variable:</Text>
+      <Text>Option Variable:</Text>
       <Text>{`Name: ${name}`}</Text>
       <Text>{`Value: ${value}`}</Text>
       <Text>{`Default: ${defaultValue}`}</Text>
@@ -209,7 +209,7 @@ function StringVariable({ info }) {
 
   return (
     <View>
-      <Text>Floating Variable:</Text>
+      <Text>String Variable:</Text>
       <Text>{`Name: ${name}`}</Text>
       <Text>{`Value: ${value}`}</Text>
       <Text>{`Default: ${defaultValue}`}</Text>

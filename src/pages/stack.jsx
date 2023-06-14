@@ -23,7 +23,7 @@ import {
 
 import {
   withSafeHeaderStyles,
-} from 'src/components/safeHeader';
+} from 'src/components/safeRegions';
 
 // create a safe header that will bump the content down below the main header
 const SafeHeader = withSafeHeaderStyles(View);

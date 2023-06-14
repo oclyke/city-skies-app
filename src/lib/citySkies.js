@@ -156,6 +156,13 @@ export default class CitySkiesInstance {
           ),
           mergeOutputStackLayerConfig: (stack, layer, config) => (
             fetchPathJson(paths.outputStackLayerConfig(stack, layer), { method: 'PUT', body: JSON.stringify(config) })
+              .then(async (d) => {
+                // update the cached output stack data
+                fetchPathJson(paths.outputStackLayer(stack, layer), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached layer data', e));
+                return d;
+              })
           ),
           addOutputStackLayer: (stack, data) => (
             fetchPathJson(`${paths.outputStack(stack)}/layer`, { method: 'POST', body: JSON.stringify(data) })

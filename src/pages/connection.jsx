@@ -12,7 +12,7 @@ import {
 
 import {
   withSafeHeaderStyles,
-} from 'src/components/safeHeader';
+} from 'src/components/safeRegions';
 
 import {
   useFavoriteConnectionsApi,

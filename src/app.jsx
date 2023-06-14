@@ -33,7 +33,7 @@ import Navigation from 'src/components/navigation';
 
 import {
   withSafeHeaderStyles,
-} from 'src/components/safeHeader';
+} from 'src/components/safeRegions';
 
 const styles = StyleSheet.create({
   container: {

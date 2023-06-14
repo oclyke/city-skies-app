@@ -20,12 +20,14 @@ import {
 
 import {
   withSafeHeaderStyles,
-} from 'src/components/safeHeader';
+  withSafeFooterStyles,
+} from 'src/components/safeRegions';
 
 import KVStore from 'src/lib/kvstore';
 
 // create a safe header that will bump the content down below the main header
 const SafeHeader = withSafeHeaderStyles(View);
+const SafeFooter = withSafeFooterStyles(View);
 
 const styles = StyleSheet.create({
   container: {
@@ -143,6 +145,7 @@ export default function Shards() {
             </View>
           </React.Fragment>
         ))}
+        <SafeFooter />
       </ScrollView>
     </>
   );
