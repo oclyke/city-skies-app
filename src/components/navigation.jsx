@@ -89,6 +89,18 @@ export default function Navigation() {
           <Button
             // mode="outlined"
             style={styles.navButton}
+            icon="globe-model"
+            onPress={() => {
+              navigate('/global');
+            }}
+          >
+            <Text>Global</Text>
+          </Button>
+
+          {/* connection */}
+          <Button
+            // mode="outlined"
+            style={styles.navButton}
             icon="devices"
             onPress={() => {
               navigate('/connection');

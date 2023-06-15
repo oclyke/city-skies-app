@@ -28,6 +28,7 @@ import Connection from 'src/pages/connection';
 import Stack from 'src/pages/stack';
 import Shards from 'src/pages/shards';
 import Layer from 'src/pages/layer';
+import Global from 'src/pages/global';
 
 import Navigation from 'src/components/navigation';
 
@@ -126,6 +127,7 @@ export default function App() {
       <Route path="/" element={<Layout />}>
         <Route path="connection" element={<Connection />} />
         <Route path="shards/*" element={<Shards />} />
+        <Route path="global" element={<Global />} />
         <Route path="stack/:stackId" element={<Stack />} />
         <Route path="layer/:stackId/:layerId" element={<Layer />} />
       </Route>

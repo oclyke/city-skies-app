@@ -100,6 +100,54 @@ export function useInstanceData(get, ...args) {
   return [data, loading];
 }
 
+export function useInstanceGlobal() {
+  const [, {
+    getGlobal,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getGlobal);
+  return state;
+}
+
+export function useInstanceGlobalVariable(variableId) {
+  const [, {
+    getGlobalVariable,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getGlobalVariable, variableId);
+  return state;
+}
+
+export function useInstanceAudio() {
+  const [, {
+    getAudio,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getAudio);
+  return state;
+}
+
+export function useInstanceAudioSource(sourceId) {
+  const [, {
+    getAudioSource,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getAudioSource, sourceId);
+  return state;
+}
+
+export function useInstanceAudioSourceStandardVariable(sourceId, layerId) {
+  const [, {
+    getAudioSourceStandardVariable,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getAudioSourceStandardVariable, sourceId, layerId);
+  return state;
+}
+
+export function useInstanceAudioSourceVariable(sourceId, variableId) {
+  const [, {
+    getAudioSourceVariable,
+  }] = useCitySkiesApi();
+  const state = useInstanceData(getAudioSourceVariable, sourceId, variableId);
+  return state;
+}
+
 /**
  * Hook for output data from the instance.
  * @returns the output data and loading status from useInstanceData.

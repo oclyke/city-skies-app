@@ -82,8 +82,8 @@ export default class CitySkiesInstance {
         const paths = {
           audio: () => `${prefix}/audio`,
           audioSource: (source) => `${prefix}/audio/source/${source}`,
-          audioSourceVariable: (source, variable) => `${prefix}/audio/${source}/variable/${variable}`,
-          audioSourceStandardVariable: (source, variable) => `${prefix}/audio/${source}/standard_variable/${variable}`,
+          audioSourceVariable: (source, variable) => `${prefix}/audio/source/${source}/variable/${variable}`,
+          audioSourceStandardVariable: (source, variable) => `${prefix}/audio/source/${source}/standard_variable/${variable}`,
           global: () => `${prefix}/global`,
           globalVariable: (variable) => `${prefix}/global/variable/${variable}`,
           output: () => `${prefix}/output`,
@@ -120,9 +120,23 @@ export default class CitySkiesInstance {
           // setters
           setAudioSourceVariable: (source, variable, value) => (
             fetchPathJson(paths.audioSourceVariable(source, variable), { method: 'PUT', body: JSON.stringify({ value }) })
+              .then(async (d) => {
+                // update the cached output stack layer data
+                fetchPathJson(paths.audioSourceVariable(source, variable), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached audio source variable data', e));
+                return d;
+              })
           ),
           setAudioSourceStandardVariable: (source, variable, value) => (
             fetchPathJson(paths.audioSourceStandardVariable(source, variable), { method: 'PUT', body: JSON.stringify({ value }) })
+              .then(async (d) => {
+                // update the cached output stack layer data
+                fetchPathJson(paths.audioSourceStandardVariable(source, variable), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached audio source standard variable data', e));
+                return d;
+              })
           ),
           setGlobalVariable: (variable, value) => (
             fetchPathJson(paths.globalVariable(variable), { method: 'PUT', body: JSON.stringify({ value }) })
@@ -166,6 +180,16 @@ export default class CitySkiesInstance {
           // modifiers
           activateOutputStack: (stack) => (
             fetchPathJson(paths.outputStackActivate(stack), { method: 'PUT', body: JSON.stringify({}) })
+          ),
+          selectAudioSource: (sourceId) => (
+            fetchPathJson(`${paths.audio()}/source`, { method: 'PUT', body: JSON.stringify({ id: sourceId }) })
+              .then(async (d) => {
+                // update the cached audio data
+                fetchPathJson(paths.audio(), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached audio data', e));
+                return d;
+              })
           ),
           mergeOutputStackLayerConfig: (stack, layer, config) => (
             fetchPathJson(paths.outputStackLayerConfig(stack, layer), { method: 'PUT', body: JSON.stringify(config) })
