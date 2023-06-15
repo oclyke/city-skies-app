@@ -245,23 +245,52 @@ function getColorStrings(colors) {
   ]).map((rgb) => `#${ColorConvert.rgb.hex(rgb)}`);
 }
 
-function ColorPaletteVariable({ info }) {
+function intToHexString(int) {
+  const hex = int.toString(16);
+  return hex;
+}
+
+function isHexColor(text) {
+  const result = parseInt(text, 16);
+  if (Number.isNaN(result)) {
+    return false;
+  }
+  return true;
+}
+
+function ColorPaletteVariable({ info, onChange }) {
+  const initialInput = `#${JSON.parse(info.value).colors.map((color) => intToHexString(color)).join('#')}`;
+  const mapType = JSON.parse(info.value).map_type;
+  const [input, setInput] = useState(initialInput);
+  const [update, setUpdate] = useState({});
+
+  function createUpdate(text, type) {
+    // parse colors
+    const nodes = text
+      .split('#')
+      .map((node) => node.trim())
+      .filter((node) => node !== '');
+
+    const colors = nodes
+      .filter((node) => (node.length >= 6 && node.length <= 8))
+      .filter((node) => isHexColor(node))
+      .map((node) => parseInt(node, 16));
+
+    const data = {
+      colors,
+      map_type: type,
+    };
+
+    return data;
+  }
+
   const {
-    data: {
-      default_range: defaultRange,
-      allowed_range: allowedRange,
-    },
-    default: defaultValue,
-    description,
-    id,
-    typecode,
     value,
   } = info;
 
   // convert string value into JSON
   const {
     colors,
-    map_type: mapType,
   } = JSON.parse(value);
 
   // convert colors to hex strings
@@ -269,14 +298,16 @@ function ColorPaletteVariable({ info }) {
 
   return (
     <View>
-      <Text>Color Palette Variable:</Text>
-      <Text>{`Name: ${id}`}</Text>
-      <Text>{`Value: ${{ colors, mapType }}`}</Text>
-      <Text>{`Default: ${defaultValue}`}</Text>
-      <Text>{`Typecode: ${typecode}`}</Text>
-      <Text>{`Allowed Range: ${allowedRange}`}</Text>
-      <Text>{`Default Range: ${defaultRange}`}</Text>
-      <Text>{`Description: ${description}`}</Text>
+      <TextInput
+        value={input}
+        onChangeText={(text) => {
+          setInput(text);
+          const data = createUpdate(text, mapType);
+          setUpdate(data);
+        }}
+        placeholder="color palette: '#fcba03 #xx03e7fc #6f03fc'"
+      />
+
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         {colorsStrings.map((color, idx) => (
           <React.Fragment key={idx}>
@@ -290,6 +321,39 @@ function ColorPaletteVariable({ info }) {
           </React.Fragment>
         ))}
       </View>
+
+      <Text />
+      {/* buttons to create map types */}
+      {[
+        'continuous_circular',
+        'discrete_circular',
+        'continuous_linear',
+        'discrete_linear',
+      ].map((type) => (
+        <React.Fragment key={type}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text>{type}</Text>
+            <RadioButton
+              value={type}
+              status={(mapType === type) ? 'checked' : 'unchecked'}
+              onPress={() => {
+                const data = createUpdate(input, type);
+                setUpdate(data);
+                onChange(JSON.stringify(data));
+              }}
+            />
+          </View>
+        </React.Fragment>
+      ))}
+
+      <Button
+        onPress={() => {
+          onChange(JSON.stringify(update));
+        }}
+      >
+        <Text>Submit</Text>
+      </Button>
+
     </View>
   );
 }
