@@ -136,7 +136,6 @@ function AudioSourceVariable({ sourceId, variableId }) {
 
   return (
     <Variable
-
       info={info}
       onChange={(value) => {
         setAudioSourceVariable(sourceId, variableId, value)
@@ -149,8 +148,6 @@ function AudioSourceVariable({ sourceId, variableId }) {
 function AudioSource({ sourceId }) {
   const [source, loading] = useInstanceAudioSource(sourceId);
 
-  console.log(source, loading)
-
   if (loading === true) {
     return (
       <Text>Loading</Text>
@@ -160,11 +157,9 @@ function AudioSource({ sourceId }) {
   const {
     variables: {
       ids: variableIds,
-      total: variableTotal,
     },
     standardVariables: {
       ids: standardIds,
-      total: standardTotal,
     },
   } = source;
 
@@ -239,7 +234,6 @@ function AudioSettings() {
   );
 }
 
-
 export default function GlobalPage() {
   return (
     <View style={styles.container}>
@@ -255,5 +249,5 @@ export default function GlobalPage() {
         <SafeFooter />
       </ScrollView>
     </View>
-  )
+  );
 }
