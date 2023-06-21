@@ -2,19 +2,9 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo',
-      [
-        '@babel/preset-env',
-        {
-          useBuiltIns: 'entry',
-          corejs: '3.22',
-        },
-      ],
-    ],
+    presets: ['babel-preset-expo'],
     plugins: [
       ['react-native-paper/babel'],
-      ['@babel/plugin-transform-private-property-in-object', { loose: true }],
-      ['@babel/plugin-transform-class-properties', { loose: true }],
       ['module-resolver', {
         alias: {
           src: './src',
