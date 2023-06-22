@@ -76,7 +76,6 @@ export default function Presets() {
               <Button
                 icon="trash-can"
                 onPress={() => {
-                  console.log('remove preset', preset);
                   remove(key);
                 }}
               >
@@ -90,7 +89,6 @@ export default function Presets() {
               <Button
                 icon="check-bold"
                 onPress={async () => {
-                  console.log('add preset layers in bulk', preset);
                   await clearOutputStackLayers(activeStackId).catch(console.error);
                   await bulkAddOutputStackLayers(activeStackId, preset.layers).catch(console.error);
                   navigate(`/stack/${activeStackId}`);
