@@ -38,7 +38,17 @@ function createStateFromDefaultList(defaults) {
  * @param {*} setState The dispatch used to change the FavoriteConnectionsState.
  * @returns The ConnectionApi.
  */
-function favoriteConnectionsApiFactory(setState, key) {
+function favoriteConnectionsApiFactory(setState, key, initial) {
+  /**
+   * Clears all favorite connections.
+   */
+  function clear() {
+    const created = createStateFromDefaultList(initial);
+    setState(created);
+    AsyncStorage.removeItem(key)
+      .catch(console.error);
+  }
+
   /**
    * Adds a connection to the favorites.
    * @param {*} connection The connection to add.
@@ -90,6 +100,7 @@ function favoriteConnectionsApiFactory(setState, key) {
   }
 
   return {
+    clear,
     add,
     remove,
   };
@@ -124,7 +135,10 @@ export default function FavoriteConnectionsProvider({ children, initial }) {
   }, [key]);
 
   // memoized API allows API consumers not to re-render on state change
-  const api = useMemo(() => favoriteConnectionsApiFactory(setState, key), [setState, key]);
+  const api = useMemo(
+    () => favoriteConnectionsApiFactory(setState, key, initial),
+    [setState, key, initial],
+  );
 
   const favorites = useMemo(() => (
     Object.keys(state.favorites).map((id) => ({ id, ...state.favorites[id] }))

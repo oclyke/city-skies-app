@@ -201,8 +201,35 @@ export default class CitySkiesInstance {
                 return d;
               })
           ),
-          addOutputStackLayer: (stack, data) => (
-            fetchPathJson(`${paths.outputStack(stack)}/layer`, { method: 'POST', body: JSON.stringify(data) })
+          addOutputStackLayer: (stack, config) => (
+            fetchPathJson(`${paths.outputStack(stack)}/layer`, { method: 'POST', body: JSON.stringify(config) })
+              .then(async (d) => {
+                // update the cached output stack data
+                fetchPathJson(paths.outputStack(stack), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached output data', e));
+                return d;
+              })
+          ),
+          clearOutputStackLayers: (stack) => (
+            fetchPathJson(`${paths.outputStack(stack)}/layers`, { method: 'DELETE' })
+              .then(async (d) => {
+                // update the cached output stack data
+                fetchPathJson(paths.outputStack(stack), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached output data', e));
+                return d;
+              })
+          ),
+          bulkAddOutputStackLayers: (stack, layersData) => (
+            fetchPathJson(`${paths.outputStack(stack)}/layers`, { method: 'POST', body: JSON.stringify(layersData) })
+              .then(async (d) => {
+                // update the cached output stack data
+                fetchPathJson(paths.outputStack(stack), { method: 'GET' })
+                  .then(([path, data]) => this.cache.store(path, data))
+                  .catch((e) => console.error('error updating the cached output data', e));
+                return d;
+              })
           ),
         };
 
@@ -211,4 +238,79 @@ export default class CitySkiesInstance {
       default: throw new Error('invalid api version');
     }
   }
+}
+
+/**
+ * Gets a snapshot of the specified stack from the instance.
+ *
+ * A snapshot is an array of layers, each with the layer configuration,
+ * variables, and standard variables.
+ *
+ * This function gets the data from the cache directly.
+ *
+ * @param {*} instance
+ * @param {*} stack_id
+ */
+export async function getStackLayersSnapshot(instance, stackId) {
+  const api = instance.getApi('v0');
+  const [, stack] = await api.getOutputStack(stackId);
+  const layerIds = stack.layers.ids;
+  const numLayers = layerIds.length;
+
+  // get the data for each layer
+  const layers = [];
+  for (let idx = 0; idx < numLayers; idx += 1) {
+    const layerId = layerIds[idx];
+
+    // eslint-disable-next-line no-await-in-loop
+    const [, data] = await api.getOutputStackLayer(stackId, layerId);
+    const {
+      config,
+      variables: {
+        ids: variableIds,
+      },
+      standardVariables: {
+        ids: standardVariableIds,
+      },
+    } = data;
+
+    // eslint-disable-next-line no-await-in-loop
+    const variableInfos = await Promise.all(
+      variableIds.map((variableId) => (
+        api.getOutputStackLayerVariable(stackId, layerId, variableId))),
+    );
+    const variables = variableInfos.reduce((acc, [, info]) => {
+      const {
+        id,
+        value,
+      } = info;
+      acc[id] = value;
+      return acc;
+    }, {});
+
+    // eslint-disable-next-line no-await-in-loop
+    const standardVariableInfos = await Promise.all(
+      standardVariableIds.map((variableId) => (
+        api.getOutputStackLayerStandardVariable(stackId, layerId, variableId)
+      )),
+    );
+    const standardVariables = standardVariableInfos.reduce((acc, [, info]) => {
+      const {
+        id,
+        value,
+      } = info;
+      acc[id] = value;
+      return acc;
+    }, {});
+
+    const layer = {
+      config,
+      variables,
+      standardVariables,
+    };
+
+    layers.push(layer);
+  }
+
+  return layers;
 }

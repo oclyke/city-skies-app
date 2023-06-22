@@ -27,7 +27,7 @@ export function withSafeHeaderStyles(Component) {
 export function withSafeFooterStyles(Component) {
   return function inner(props) {
     const insets = useSafeAreaInsets();
-    const offset = 50;
+    const offset = 100;
     let style;
     if (typeof props.style !== 'undefined') {
       style = {

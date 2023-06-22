@@ -57,66 +57,102 @@ export default function Navigation() {
   const navigate = useNavigate();
 
   return (
-    <Surface elevation={4} style={styles.surface}>
-      <View style={styles.vcenter}>
-        <View style={styles.nav}>
+    <>
+      {/* first nav */}
+      <Surface elevation={4} style={styles.surface}>
+        <View style={styles.vcenter}>
+          <View style={styles.nav}>
 
-          {/* stacks */}
-          <Button
-            // mode="outlined"
-            style={styles.navButton}
-            icon="layers-triple"
-            onPress={() => {
-              navigate(`/stack/${activeStackId}`);
-            }}
-          >
-            <Text>Layers</Text>
-          </Button>
-
-          {/* shards */}
-          <Button
-            // mode="outlined"
-            style={styles.navButton}
-            icon="layers-plus"
-            onPress={() => {
-              navigate('/shards');
-            }}
-          >
-            <Text>Shards</Text>
-          </Button>
-
-          {/* connection */}
-          <Button
-            // mode="outlined"
-            style={styles.navButton}
-            icon="globe-model"
-            onPress={() => {
-              navigate('/global');
-            }}
-          >
-            <Text>Global</Text>
-          </Button>
-
-          {/* connection */}
-          <Button
-            // mode="outlined"
-            style={styles.navButton}
-            icon="devices"
-            onPress={() => {
-              navigate('/connection');
-            }}
-          >
-            <Text>Connection</Text>
-            <View
-              style={{
-                ...styles.circle,
-                backgroundColor: (connected) ? 'green' : 'red',
+            {/* presets */}
+            <Button
+              // mode="outlined"
+              style={styles.navButton}
+              icon="magic-staff"
+              onPress={() => {
+                navigate('/presets');
               }}
-            />
-          </Button>
+            >
+              <Text>Presets</Text>
+            </Button>
 
+            {/* colors */}
+            <Button
+              // mode="outlined"
+              style={styles.navButton}
+              icon="select-color"
+              onPress={() => {
+                navigate('/colors');
+              }}
+            >
+              <Text>Colors</Text>
+            </Button>
+
+          </View>
         </View>
-      </View>
-    </Surface>
+      </Surface>
+
+      {/* second nav */}
+      <Surface elevation={4} style={styles.surface}>
+        <View style={styles.vcenter}>
+          <View style={styles.nav}>
+
+            {/* stacks */}
+            <Button
+              // mode="outlined"
+              style={styles.navButton}
+              icon="layers-triple"
+              onPress={() => {
+                navigate(`/stack/${activeStackId}`);
+              }}
+            >
+              <Text>Layers</Text>
+            </Button>
+
+            {/* shards */}
+            <Button
+              // mode="outlined"
+              style={styles.navButton}
+              icon="layers-plus"
+              onPress={() => {
+                navigate('/shards');
+              }}
+            >
+              <Text>Shards</Text>
+            </Button>
+
+            {/* global */}
+            <Button
+              // mode="outlined"
+              style={styles.navButton}
+              icon="globe-model"
+              onPress={() => {
+                navigate('/global');
+              }}
+            >
+              <Text>Global</Text>
+            </Button>
+
+            {/* connection */}
+            <Button
+              // mode="outlined"
+              style={styles.navButton}
+              icon="devices"
+              onPress={() => {
+                navigate('/connection');
+              }}
+            >
+              <Text>Connection</Text>
+              <View
+                style={{
+                  ...styles.circle,
+                  backgroundColor: (connected) ? 'green' : 'red',
+                }}
+              />
+            </Button>
+
+          </View>
+        </View>
+      </Surface>
+    </>
   );
 }

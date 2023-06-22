@@ -11,8 +11,18 @@ import {
 
 import CitySkiesProvider from 'src/providers/citySkies';
 import FavoriteConnectionsProvider from 'src/providers/favoriteConnections';
+import PresetsProvider from 'src/providers/presets';
+import ColorsProvider from 'src/providers/colors';
 import CitySkiesInterface from 'src/lib/citySkies';
 import App from 'src/app';
+
+import {
+  defaultPresets,
+} from 'src/data/presets';
+
+import {
+  defaultColors,
+} from 'src/data/colors';
 
 const theme = {
   ...DefaultTheme,
@@ -32,9 +42,17 @@ export default function Main() {
             { name: 'Home', address: '127.0.0.1:1337' },
           ]}
         >
-          <PaperProvider theme={theme}>
-            <App />
-          </PaperProvider>
+          <PresetsProvider
+            initial={defaultPresets}
+          >
+            <ColorsProvider
+              initial={defaultColors}
+            >
+              <PaperProvider theme={theme}>
+                <App />
+              </PaperProvider>
+            </ColorsProvider>
+          </PresetsProvider>
         </FavoriteConnectionsProvider>
       </CitySkiesProvider>
     </NativeRouter>

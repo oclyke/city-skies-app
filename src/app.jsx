@@ -29,6 +29,8 @@ import Stack from 'src/pages/stack';
 import Shards from 'src/pages/shards';
 import Layer from 'src/pages/layer';
 import Global from 'src/pages/global';
+import Presets from 'src/pages/presets';
+import Colors from 'src/pages/colors';
 
 import Navigation from 'src/components/navigation';
 
@@ -125,6 +127,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
+        <Route path="presets" element={<Presets />} />
+        <Route path="colors" element={<Colors />} />
         <Route path="connection" element={<Connection />} />
         <Route path="shards/*" element={<Shards />} />
         <Route path="global" element={<Global />} />

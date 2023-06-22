@@ -10,6 +10,7 @@ import {
   Text,
   Surface,
   RadioButton,
+  Button,
 } from 'react-native-paper';
 
 import {
@@ -30,6 +31,18 @@ import {
   useInstanceAudioSourceVariable,
   useInstanceApi,
 } from 'src/hooks/citySkies';
+
+import {
+  useColorsApi,
+} from 'src/providers/colors';
+
+import {
+  usePresetsApi,
+} from 'src/providers/presets';
+
+import {
+  useFavoriteConnectionsApi,
+} from 'src/providers/favoriteConnections';
 
 // create a safe header that will bump the content down below the main header
 const SafeHeader = withSafeHeaderStyles(View);
@@ -235,10 +248,24 @@ function AudioSettings() {
 }
 
 export default function GlobalPage() {
+  const { clear: clearColors } = useColorsApi();
+  const { clear: clearPresets } = usePresetsApi();
+  const { clear: clearFavoriteConnections } = useFavoriteConnectionsApi();
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.container}>
         <SafeHeader />
+
+        <Button
+          onPress={() => {
+            clearColors();
+            clearPresets();
+            clearFavoriteConnections();
+          }}
+        >
+          <Text>Reset All Async Storage Items</Text>
+        </Button>
 
         <Text variant="titleLarge">Global Values</Text>
         <GlobalSettings />

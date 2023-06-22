@@ -137,7 +137,7 @@ export default function Shards() {
               <Button
                 title="add"
                 onPress={() => {
-                  addOutputStackLayer(active, { shard_uuid: shard })
+                  addOutputStackLayer(active, { config: { shard_uuid: shard } })
                     .catch(console.error);
                 }}
               />
