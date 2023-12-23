@@ -246,7 +246,10 @@ function getColorStrings(colors) {
 }
 
 function intToHexString(int) {
-  const hex = int.toString(16);
+  let hex = int.toString(16);
+  while (hex.length < 6) {
+    hex = `0${hex}`;
+  }
   return hex;
 }
 
@@ -259,11 +262,6 @@ function isHexColor(text) {
 }
 
 function ColorPaletteVariable({ info, onChange }) {
-  const initialInput = `#${JSON.parse(info.value).colors.map((color) => intToHexString(color)).join('#')}`;
-  const mapType = JSON.parse(info.value).map_type;
-  const [input, setInput] = useState(initialInput);
-  const [update, setUpdate] = useState({});
-
   function createUpdate(text, type) {
     // parse colors
     const nodes = text
@@ -278,15 +276,22 @@ function ColorPaletteVariable({ info, onChange }) {
 
     const data = {
       colors,
-      map_type: type,
+      interpolator: type,
     };
 
     return data;
   }
 
+  const initialInput = `#${JSON.parse(info.value).colors.map((color) => intToHexString(color)).join('#')}`;
+  const mapType = JSON.parse(info.value).interpolator;
+  const [input, setInput] = useState(initialInput);
+  const [update, setUpdate] = useState(createUpdate(input, mapType));
+
   const {
     value,
   } = info;
+
+  console.log('value', value);
 
   // convert string value into JSON
   const {
@@ -325,10 +330,10 @@ function ColorPaletteVariable({ info, onChange }) {
       <Text />
       {/* buttons to create map types */}
       {[
-        'continuous_circular',
-        'discrete_circular',
-        'continuous_linear',
-        'discrete_linear',
+        'CONTINUOUS_CIRCULAR',
+        'DISCRETE_CIRCULAR',
+        'CONTINUOUS_LINEAR',
+        'DISCRETE_LINEAR',
       ].map((type) => (
         <React.Fragment key={type}>
           <View style={{ flexDirection: 'row' }}>
